@@ -2,6 +2,8 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8eU89XL7ucxbU
 const DEFAULT_IMAGE = "img/default.jpg";
 
 document.addEventListener("DOMContentLoaded", () => {
+    createImageModal();
+
     fetch(CSV_URL)
         .then(res => res.text())
         .then(text => {
@@ -71,16 +73,16 @@ function driveToImageUrl(url) {
 
     const clean = url.replace(/^"+|"+$/g, "").trim();
 
-    // uc?id=XXXX
-    if (clean.includes("drive.google.com/uc")) {
-        const id = clean.split("id=")[1];
-        return `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
-    }
+    if (clean.includes("lh3.googleusercontent.com")) return clean;
 
-    // file/d/XXXX/view
     if (clean.includes("/file/d/")) {
         const id = clean.split("/file/d/")[1].split("/")[0];
-        return `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
+        return `https://lh3.googleusercontent.com/d/${id}`;
+    }
+
+    if (clean.includes("id=")) {
+        const id = clean.split("id=")[1];
+        return `https://lh3.googleusercontent.com/d/${id}`;
     }
 
     return clean;
@@ -90,6 +92,36 @@ function isValidUrl(url) {
     return /^https?:\/\//i.test(url);
 }
 
+/* ===== MODAL ===== */
+function createImageModal() {
+    const modal = document.createElement("div");
+    modal.id = "image-modal";
+    modal.innerHTML = `
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <span class="modal-close">✕</span>
+            <img src="" alt="Imagen del producto">
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector(".modal-backdrop").onclick = closeModal;
+    modal.querySelector(".modal-close").onclick = closeModal;
+}
+
+function openModal(src) {
+    const modal = document.getElementById("image-modal");
+    const img = modal.querySelector("img");
+    img.src = src;
+    modal.classList.add("active");
+}
+
+function closeModal() {
+    const modal = document.getElementById("image-modal");
+    modal.classList.remove("active");
+}
+
+/* ===== RENDER ===== */
 function renderMenu(items) {
     items.forEach(item => {
 
@@ -122,6 +154,8 @@ function renderMenu(items) {
 
         const img = producto.querySelector("img");
         img.onerror = () => img.src = DEFAULT_IMAGE;
+
+        producto.onclick = () => openModal(imgSrc);
 
         contenedor.appendChild(producto);
     });
