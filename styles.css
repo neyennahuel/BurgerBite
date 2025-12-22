@@ -1,33 +1,113 @@
-/* ===== MODAL FULLSCREEN (MOBILE FIRST) ===== */
-.image-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.95);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 16px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
 }
 
-.image-modal.active {
-    display: flex;
+body {
+    background-color: #121212;
+    color: #f5f5f5;
+    padding: 20px;
 }
 
-.image-modal img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 12px;
+/* HEADER */
+header {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
-/* Botón cerrar */
-.image-modal .close {
-    position: absolute;
-    top: 14px;
-    right: 16px;
-    font-size: 30px;
+header h1 {
+    font-size: 2.4rem;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+header p {
+    color: #bbb;
+    font-size: 1rem;
+}
+
+/* SECCIONES */
+section {
+    margin-bottom: 50px;
+}
+
+section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    border-left: 5px solid #e63946;
+    padding-left: 10px;
     color: #fff;
-    cursor: pointer;
-    line-height: 1;
+}
+
+/* GRID */
+.productos {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+/* CARD */
+.producto {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    display: flex;
+    gap: 15px;
+    padding: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+}
+
+/* IMAGEN */
+.producto img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* INFO */
+.producto .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.producto h3 {
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.producto p {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.producto .precio {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #e63946;
+}
+
+/* RESPONSIVE */
+@media (min-width: 600px) {
+    .productos {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 900px) {
+    .productos {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
