@@ -3,6 +3,8 @@ const DEFAULT_IMAGE = "img/default.jpg";
 
 /* ===== INIT ===== */
 document.addEventListener("DOMContentLoaded", () => {
+    createImageModal();
+
     fetch(CSV_URL)
         .then(res => res.text())
         .then(text => {
@@ -80,6 +82,36 @@ function driveToImageUrl(url) {
     return clean;
 }
 
+/* ===== MODAL FULLSCREEN ===== */
+function createImageModal() {
+    const modal = document.createElement("div");
+    modal.className = "image-modal";
+    modal.innerHTML = `
+        <span class="close">&times;</span>
+        <img src="" alt="">
+    `;
+    document.body.appendChild(modal);
+
+    const img = modal.querySelector("img");
+    const close = modal.querySelector(".close");
+
+    close.onclick = () => closeModal(modal);
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal(modal);
+    };
+
+    window.openImageModal = (src) => {
+        img.src = src;
+        modal.classList.add("active");
+        document.body.classList.add("modal-open");
+    };
+}
+
+function closeModal(modal) {
+    modal.classList.remove("active");
+    document.body.classList.remove("modal-open");
+}
+
 /* ===== RENDER ===== */
 function renderMenu(items) {
     items.forEach(item => {
@@ -105,8 +137,11 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-        img.onerror = () => {
-            img.src = DEFAULT_IMAGE;
+        img.onerror = () => img.src = DEFAULT_IMAGE;
+
+        img.onclick = (e) => {
+            e.stopPropagation();
+            window.openImageModal(img.src);
         };
 
         contenedor.appendChild(producto);
