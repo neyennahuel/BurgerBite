@@ -8,8 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = parseCSV(text);
             renderMenu(data);
         })
-        .catch(err => {
-            console.error(err);
+        .catch(() => {
             alert("No se pudo cargar la carta.");
         });
 });
@@ -54,7 +53,7 @@ function parseCSV(text) {
     return rows.map(cols => {
         const item = {};
         headers.forEach((h, i) => {
-            item[h] = cols[i] || "";
+            item[h.trim()] = cols[i] ? cols[i].trim() : "";
         });
         return item;
     });
@@ -65,6 +64,12 @@ function normalize(text) {
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
+}
+
+function cleanUrl(url) {
+    return url
+        .replace(/^"+|"+$/g, "") // quita comillas
+        .trim();
 }
 
 function isValidUrl(url) {
@@ -83,9 +88,14 @@ function renderMenu(items) {
         const producto = document.createElement("div");
         producto.className = "producto";
 
-        const imgSrc = (item.Imagen && isValidUrl(item.Imagen))
-            ? item.Imagen
-            : DEFAULT_IMAGE;
+        let imgSrc = DEFAULT_IMAGE;
+
+        if (item.Imagen) {
+            const cleaned = cleanUrl(item.Imagen);
+            if (isValidUrl(cleaned)) {
+                imgSrc = cleaned;
+            }
+        }
 
         producto.innerHTML = `
             <img src="${imgSrc}" alt="${item.Nombre}">
@@ -97,7 +107,9 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-        img.onerror = () => img.src = DEFAULT_IMAGE;
+        img.onerror = () => {
+            img.src = DEFAULT_IMAGE;
+        };
 
         contenedor.appendChild(producto);
     });
