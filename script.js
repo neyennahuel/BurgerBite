@@ -1,9 +1,8 @@
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8eU89XL7ucxbUaggrjgyWlnT6oDKMGRCL6SO7ywbM-ObzBueYGiVtYMHUx7PJ1fqJIrcrcuGcTG2g/pub?gid=0&single=true&output=csv";
 const DEFAULT_IMAGE = "img/default.jpg";
 
+/* ===== INIT ===== */
 document.addEventListener("DOMContentLoaded", () => {
-    createImageModal();
-
     fetch(CSV_URL)
         .then(res => res.text())
         .then(text => {
@@ -68,6 +67,7 @@ function normalize(text) {
 
 function driveToImageUrl(url) {
     if (!url) return "";
+
     const clean = url.replace(/^"+|"+$/g, "").trim();
 
     if (clean.includes("lh3.googleusercontent.com")) return clean;
@@ -81,29 +81,19 @@ function driveToImageUrl(url) {
 }
 
 /* ===== MODAL ===== */
-function createImageModal() {
-    const modal = document.createElement("div");
-    modal.id = "image-modal";
-    modal.innerHTML = `
-        <div class="modal-backdrop"></div>
-        <img class="modal-image" src="" alt="">
-    `;
-    document.body.appendChild(modal);
+const modal = document.getElementById("imageModal");
+const modalImg = document.getElementById("modalImage");
+const closeModalBtn = document.getElementById("closeModal");
 
-    modal.onclick = closeModal;
-}
-
-function openModal(src) {
-    const modal = document.getElementById("image-modal");
-    const img = modal.querySelector(".modal-image");
-    img.src = src;
-    modal.classList.add("active");
-}
-
-function closeModal() {
-    const modal = document.getElementById("image-modal");
+closeModalBtn.onclick = () => {
     modal.classList.remove("active");
-}
+};
+
+modal.onclick = (e) => {
+    if (e.target === modal) {
+        modal.classList.remove("active");
+    }
+};
 
 /* ===== RENDER ===== */
 function renderMenu(items) {
@@ -130,11 +120,15 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-        img.onerror = () => img.src = DEFAULT_IMAGE;
+
+        img.onerror = () => {
+            img.src = DEFAULT_IMAGE;
+        };
 
         img.onclick = (e) => {
             e.stopPropagation();
-            openModal(imgSrc);
+            modalImg.src = img.src;
+            modal.classList.add("active");
         };
 
         contenedor.appendChild(producto);
