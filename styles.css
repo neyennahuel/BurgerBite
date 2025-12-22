@@ -216,3 +216,17 @@ section h2 {
         height: 26px;
     }
 }
+/* ===== AJUSTE WHATSAPP SOLO DESKTOP ===== */
+@media (min-width: 768px) {
+    .whatsapp-float {
+        width: 44px;
+        height: 44px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .whatsapp-float img {
+        width: 22px;
+        height: 22px;
+    }
+}
