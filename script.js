@@ -46,6 +46,10 @@ function isValidUrl(value) {
 
 function renderMenu(items) {
     items.forEach(item => {
+
+        // 👇 LOG CLAVE PARA DIAGNÓSTICO
+        console.log("IMAGEN LEÍDA:", item.Imagen);
+
         if (item.Disponible !== "TRUE") return;
 
         const categoriaId = normalize(item.Categoria);
