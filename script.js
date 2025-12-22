@@ -66,10 +66,24 @@ function normalize(text) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-function cleanUrl(url) {
-    return url
-        .replace(/^"+|"+$/g, "") // quita comillas
-        .trim();
+function driveToImageUrl(url) {
+    if (!url) return "";
+
+    const clean = url.replace(/^"+|"+$/g, "").trim();
+
+    // uc?id=XXXX
+    if (clean.includes("drive.google.com/uc")) {
+        const id = clean.split("id=")[1];
+        return `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
+    }
+
+    // file/d/XXXX/view
+    if (clean.includes("/file/d/")) {
+        const id = clean.split("/file/d/")[1].split("/")[0];
+        return `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
+    }
+
+    return clean;
 }
 
 function isValidUrl(url) {
@@ -91,9 +105,9 @@ function renderMenu(items) {
         let imgSrc = DEFAULT_IMAGE;
 
         if (item.Imagen) {
-            const cleaned = cleanUrl(item.Imagen);
-            if (isValidUrl(cleaned)) {
-                imgSrc = cleaned;
+            const finalUrl = driveToImageUrl(item.Imagen);
+            if (isValidUrl(finalUrl)) {
+                imgSrc = finalUrl;
             }
         }
 
@@ -107,9 +121,7 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-        img.onerror = () => {
-            img.src = DEFAULT_IMAGE;
-        };
+        img.onerror = () => img.src = DEFAULT_IMAGE;
 
         contenedor.appendChild(producto);
     });
