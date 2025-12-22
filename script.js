@@ -57,10 +57,8 @@ function renderMenu(items) {
 
         let imgSrc = DEFAULT_IMAGE;
 
-        if (item.Imagen) {
-            imgSrc = isValidUrl(item.Imagen)
-                ? item.Imagen
-                : DEFAULT_IMAGE;
+        if (item.Imagen && isValidUrl(item.Imagen)) {
+            imgSrc = item.Imagen;
         }
 
         producto.innerHTML = `
