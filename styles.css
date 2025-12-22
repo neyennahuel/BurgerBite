@@ -268,3 +268,47 @@ section h2 {
         height: 22px;
     }
 }
+/* ================================================= */
+/* ============ VARIANTE PROMOS AGRESIVA ============ */
+/* ================================================= */
+
+#promos h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #e63946;
+}
+
+/* Card promo */
+#promos .producto {
+    border: 2px solid rgba(230, 57, 70, 0.25);
+    background: linear-gradient(
+        145deg,
+        #1e1e1e,
+        #171717
+    );
+}
+
+/* Nombre promo */
+#promos .producto h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Descripción promo */
+#promos .producto p {
+    font-size: 0.95rem;
+    color: #ddd;
+}
+
+/* Precio promo (AGRESIVO) */
+#promos .producto .precio {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #e63946;
+}
