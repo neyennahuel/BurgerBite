@@ -3,32 +3,59 @@ const DEFAULT_IMAGE = "img/default.jpg";
 
 document.addEventListener("DOMContentLoaded", () => {
     fetch(CSV_URL)
-        .then(response => response.text())
+        .then(res => res.text())
         .then(text => {
             const data = parseCSV(text);
             renderMenu(data);
         })
-        .catch(() => {
-            alert("No se pudo cargar la carta. Intente nuevamente más tarde.");
+        .catch(err => {
+            console.error(err);
+            alert("No se pudo cargar la carta.");
         });
 });
 
 function parseCSV(text) {
-    const lines = text
-        .split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+    const rows = [];
+    let row = [];
+    let current = "";
+    let inQuotes = false;
 
-    const headers = lines[0].split(",").map(h => h.trim());
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
 
-    return lines.slice(1).map(line => {
-        const values = line.split(",");
+        if (char === '"' && inQuotes && next === '"') {
+            current += '"';
+            i++;
+        } else if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === "," && !inQuotes) {
+            row.push(current.trim());
+            current = "";
+        } else if ((char === "\n" || char === "\r") && !inQuotes) {
+            if (current || row.length) {
+                row.push(current.trim());
+                rows.push(row);
+            }
+            row = [];
+            current = "";
+        } else {
+            current += char;
+        }
+    }
+
+    if (current || row.length) {
+        row.push(current.trim());
+        rows.push(row);
+    }
+
+    const headers = rows.shift();
+
+    return rows.map(cols => {
         const item = {};
-
-        headers.forEach((header, index) => {
-            item[header] = values[index]?.trim() || "";
+        headers.forEach((h, i) => {
+            item[h] = cols[i] || "";
         });
-
         return item;
     });
 }
@@ -40,8 +67,8 @@ function normalize(text) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-function isValidUrl(value) {
-    return value.startsWith("http://") || value.startsWith("https://");
+function isValidUrl(url) {
+    return /^https?:\/\//i.test(url);
 }
 
 function renderMenu(items) {
@@ -56,11 +83,9 @@ function renderMenu(items) {
         const producto = document.createElement("div");
         producto.className = "producto";
 
-        let imgSrc = DEFAULT_IMAGE;
-
-        if (item.Imagen && isValidUrl(item.Imagen)) {
-            imgSrc = item.Imagen;
-        }
+        const imgSrc = (item.Imagen && isValidUrl(item.Imagen))
+            ? item.Imagen
+            : DEFAULT_IMAGE;
 
         producto.innerHTML = `
             <img src="${imgSrc}" alt="${item.Nombre}">
@@ -72,9 +97,7 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-        img.onerror = () => {
-            img.src = DEFAULT_IMAGE;
-        };
+        img.onerror = () => img.src = DEFAULT_IMAGE;
 
         contenedor.appendChild(producto);
     });
