@@ -82,7 +82,7 @@ function driveToImageUrl(url) {
     return clean;
 }
 
-/* ===== MODAL FULLSCREEN ===== */
+/* ===== MODAL + FULLSCREEN ===== */
 function createImageModal() {
     const modal = document.createElement("div");
     modal.className = "image-modal";
@@ -104,12 +104,23 @@ function createImageModal() {
         img.src = src;
         modal.classList.add("active");
         document.body.classList.add("modal-open");
+
+        // FULLSCREEN REAL (mobile)
+        if (modal.requestFullscreen) {
+            modal.requestFullscreen();
+        } else if (modal.webkitRequestFullscreen) {
+            modal.webkitRequestFullscreen(); // iOS
+        }
     };
 }
 
 function closeModal(modal) {
     modal.classList.remove("active");
     document.body.classList.remove("modal-open");
+
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    }
 }
 
 /* ===== RENDER ===== */
