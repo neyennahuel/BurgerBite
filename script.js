@@ -40,6 +40,10 @@ function normalize(text) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
+function isValidUrl(value) {
+    return value.startsWith("http://") || value.startsWith("https://");
+}
+
 function renderMenu(items) {
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
@@ -51,7 +55,13 @@ function renderMenu(items) {
         const producto = document.createElement("div");
         producto.className = "producto";
 
-        const imgSrc = item.Imagen ? `img/${item.Imagen}` : DEFAULT_IMAGE;
+        let imgSrc = DEFAULT_IMAGE;
+
+        if (item.Imagen) {
+            imgSrc = isValidUrl(item.Imagen)
+                ? item.Imagen
+                : DEFAULT_IMAGE;
+        }
 
         producto.innerHTML = `
             <img src="${imgSrc}" alt="${item.Nombre}">
@@ -63,7 +73,9 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-        img.onerror = () => img.src = DEFAULT_IMAGE;
+        img.onerror = () => {
+            img.src = DEFAULT_IMAGE;
+        };
 
         contenedor.appendChild(producto);
     });
