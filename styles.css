@@ -1,4 +1,7 @@
-/* ===== RESET ===== */
+/* ================================================= */
+/* ==================== RESET ====================== */
+/* ================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,20 +9,26 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* ===== BODY ===== */
+/* ================================================= */
+/* ===================== BODY ====================== */
+/* ================================================= */
+
 body {
     background-color: #121212;
     color: #f5f5f5;
     padding: 20px;
 }
 
-/* bloquear scroll cuando el modal está activo */
+/* bloquear scroll cuando modal activo */
 body.modal-open {
     overflow: hidden;
     height: 100%;
 }
 
-/* ===== HEADER ===== */
+/* ================================================= */
+/* ==================== HEADER ===================== */
+/* ================================================= */
+
 header {
     text-align: center;
     margin-bottom: 40px;
@@ -49,7 +58,7 @@ header p {
     font-weight: 300;
 }
 
-/* ===== ANIMACIÓN LOGO ===== */
+/* animación logo */
 @keyframes logoFadeIn {
     to {
         opacity: 1;
@@ -57,7 +66,10 @@ header p {
     }
 }
 
-/* ===== SECCIONES ===== */
+/* ================================================= */
+/* ================== SECCIONES ==================== */
+/* ================================================= */
+
 section {
     margin-bottom: 50px;
 }
@@ -72,17 +84,23 @@ section h2 {
     color: #fff;
 }
 
-/* ===== GRID ===== */
+/* ================================================= */
+/* ===================== GRID ====================== */
+/* ================================================= */
+
 .productos {
     display: grid;
     grid-template-columns: 1fr;
     gap: 18px;
 }
 
-/* ===== CARD PRODUCTO ===== */
+/* ================================================= */
+/* ================= CARD PRODUCTO ================= */
+/* ================================================= */
+
 .producto {
     background-color: #1e1e1e;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     gap: 15px;
     padding: 12px;
@@ -92,20 +110,20 @@ section h2 {
 
 .producto:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
 }
 
-/* ===== IMAGEN CARD ===== */
+/* imagen */
 .producto img {
     width: 100px;
     height: 100px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 10px;
     flex-shrink: 0;
     cursor: pointer;
 }
 
-/* ===== INFO ===== */
+/* info */
 .producto .info {
     display: flex;
     flex-direction: column;
@@ -135,12 +153,14 @@ section h2 {
     color: #e63946;
 }
 
-/* ===== RESPONSIVE GRID ===== */
+/* ================================================= */
+/* =================== RESPONSIVE ================== */
+/* ================================================= */
+
 @media (min-width: 600px) {
     .productos {
         grid-template-columns: repeat(2, 1fr);
     }
-
     header .logo {
         width: 140px;
     }
@@ -150,21 +170,19 @@ section h2 {
     .productos {
         grid-template-columns: repeat(3, 1fr);
     }
-
     header .logo {
         width: 160px;
     }
 }
 
 /* ================================================= */
-/* ===== MODAL FULLSCREEN SUAVE + TRANSPARENTE ===== */
+/* ============ MODAL FULLSCREEN SUAVE ============== */
 /* ================================================= */
 
 .image-modal {
     position: fixed;
     inset: 0;
     width: 100vw;
-    height: 100dvh;
     height: 100svh;
 
     background: rgba(0, 0, 0, 0.45);
@@ -210,7 +228,9 @@ section h2 {
     z-index: 10000;
 }
 
-/* ================= WHATSAPP FLOAT ================= */
+/* ================================================= */
+/* =============== WHATSAPP FLOAT ================== */
+/* ================================================= */
 
 .whatsapp-float {
     position: fixed;
@@ -229,86 +249,81 @@ section h2 {
 }
 
 .whatsapp-float:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 22px rgba(0,0,0,0.8);
+    transform: scale(1.08);
 }
 
 .whatsapp-float img {
     width: 30px;
     height: 30px;
-    object-fit: contain;
 }
 
-/* Ajuste mobile */
+/* mobile */
 @media (max-width: 480px) {
     .whatsapp-float {
         width: 52px;
         height: 52px;
-        bottom: 14px;
-        right: 14px;
     }
-
     .whatsapp-float img {
         width: 26px;
         height: 26px;
     }
 }
 
-/* ===== AJUSTE WHATSAPP SOLO DESKTOP ===== */
+/* desktop */
 @media (min-width: 768px) {
     .whatsapp-float {
         width: 44px;
         height: 44px;
-        bottom: 20px;
-        right: 20px;
     }
-
     .whatsapp-float img {
         width: 22px;
         height: 22px;
     }
 }
+
 /* ================================================= */
-/* ============ VARIANTE PROMOS AGRESIVA ============ */
+/* ============ PROMOS — AGRESIVO REAL ============= */
 /* ================================================= */
 
 #promos h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 2.1rem;
-    letter-spacing: 2px;
+    font-size: 2.2rem;
+    letter-spacing: 3px;
     text-transform: uppercase;
     color: #e63946;
 }
 
-/* Card promo */
+/* card promo */
 #promos .producto {
-    border: 2px solid rgba(230, 57, 70, 0.25);
-    background: linear-gradient(
-        145deg,
-        #1e1e1e,
-        #171717
-    );
+    border: 2px solid #e63946;
+    background: linear-gradient(145deg, #1f1f1f, #151515);
+    position: relative;
 }
 
-/* Nombre promo */
-#promos .producto h3 {
+/* badge PROMO */
+#promos .producto::before {
+    content: "PROMO";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #e63946;
+    color: #fff;
     font-family: 'Oswald', sans-serif;
-    font-size: 1.4rem;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+}
+
+/* nombre promo */
+#promos .producto h3 {
+    font-size: 1.45rem;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
 
-/* Descripción promo */
-#promos .producto p {
-    font-size: 0.95rem;
-    color: #ddd;
-}
-
-/* Precio promo (AGRESIVO) */
+/* precio promo */
 #promos .producto .precio {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     font-weight: 700;
-    letter-spacing: 1px;
-    color: #e63946;
+    letter-spacing: 1.5px;
 }
