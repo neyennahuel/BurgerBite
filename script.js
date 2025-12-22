@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 });
 
+/* ===== CSV ===== */
 function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -23,12 +24,8 @@ function parseCSV(text) {
 
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        const next = text[i + 1];
 
-        if (char === '"' && inQuotes && next === '"') {
-            current += '"';
-            i++;
-        } else if (char === '"') {
+        if (char === '"') {
             inQuotes = !inQuotes;
         } else if (char === "," && !inQuotes) {
             row.push(current.trim());
@@ -55,12 +52,13 @@ function parseCSV(text) {
     return rows.map(cols => {
         const item = {};
         headers.forEach((h, i) => {
-            item[h.trim()] = cols[i] ? cols[i].trim() : "";
+            item[h.trim()] = cols[i] || "";
         });
         return item;
     });
 }
 
+/* ===== HELPERS ===== */
 function normalize(text) {
     return text
         .toLowerCase()
@@ -70,15 +68,9 @@ function normalize(text) {
 
 function driveToImageUrl(url) {
     if (!url) return "";
-
     const clean = url.replace(/^"+|"+$/g, "").trim();
 
     if (clean.includes("lh3.googleusercontent.com")) return clean;
-
-    if (clean.includes("/file/d/")) {
-        const id = clean.split("/file/d/")[1].split("/")[0];
-        return `https://lh3.googleusercontent.com/d/${id}`;
-    }
 
     if (clean.includes("id=")) {
         const id = clean.split("id=")[1];
@@ -88,30 +80,22 @@ function driveToImageUrl(url) {
     return clean;
 }
 
-function isValidUrl(url) {
-    return /^https?:\/\//i.test(url);
-}
-
 /* ===== MODAL ===== */
 function createImageModal() {
     const modal = document.createElement("div");
     modal.id = "image-modal";
     modal.innerHTML = `
         <div class="modal-backdrop"></div>
-        <div class="modal-content">
-            <span class="modal-close">✕</span>
-            <img src="" alt="Imagen del producto">
-        </div>
+        <img class="modal-image" src="" alt="">
     `;
     document.body.appendChild(modal);
 
-    modal.querySelector(".modal-backdrop").onclick = closeModal;
-    modal.querySelector(".modal-close").onclick = closeModal;
+    modal.onclick = closeModal;
 }
 
 function openModal(src) {
     const modal = document.getElementById("image-modal");
-    const img = modal.querySelector("img");
+    const img = modal.querySelector(".modal-image");
     img.src = src;
     modal.classList.add("active");
 }
@@ -124,24 +108,17 @@ function closeModal() {
 /* ===== RENDER ===== */
 function renderMenu(items) {
     items.forEach(item => {
-
         if (item.Disponible !== "TRUE") return;
 
         const categoriaId = normalize(item.Categoria);
         const contenedor = document.querySelector(`#${categoriaId} .productos`);
         if (!contenedor) return;
 
+        let imgSrc = DEFAULT_IMAGE;
+        if (item.Imagen) imgSrc = driveToImageUrl(item.Imagen);
+
         const producto = document.createElement("div");
         producto.className = "producto";
-
-        let imgSrc = DEFAULT_IMAGE;
-
-        if (item.Imagen) {
-            const finalUrl = driveToImageUrl(item.Imagen);
-            if (isValidUrl(finalUrl)) {
-                imgSrc = finalUrl;
-            }
-        }
 
         producto.innerHTML = `
             <img src="${imgSrc}" alt="${item.Nombre}">
@@ -155,7 +132,10 @@ function renderMenu(items) {
         const img = producto.querySelector("img");
         img.onerror = () => img.src = DEFAULT_IMAGE;
 
-        producto.onclick = () => openModal(imgSrc);
+        img.onclick = (e) => {
+            e.stopPropagation();
+            openModal(imgSrc);
+        };
 
         contenedor.appendChild(producto);
     });
