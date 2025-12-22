@@ -80,21 +80,6 @@ function driveToImageUrl(url) {
     return clean;
 }
 
-/* ===== MODAL ===== */
-const modal = document.getElementById("imageModal");
-const modalImg = document.getElementById("modalImage");
-const closeModalBtn = document.getElementById("closeModal");
-
-closeModalBtn.onclick = () => {
-    modal.classList.remove("active");
-};
-
-modal.onclick = (e) => {
-    if (e.target === modal) {
-        modal.classList.remove("active");
-    }
-};
-
 /* ===== RENDER ===== */
 function renderMenu(items) {
     items.forEach(item => {
@@ -120,15 +105,8 @@ function renderMenu(items) {
         `;
 
         const img = producto.querySelector("img");
-
         img.onerror = () => {
             img.src = DEFAULT_IMAGE;
-        };
-
-        img.onclick = (e) => {
-            e.stopPropagation();
-            modalImg.src = img.src;
-            modal.classList.add("active");
         };
 
         contenedor.appendChild(producto);
