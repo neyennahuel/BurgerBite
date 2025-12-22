@@ -3,8 +3,6 @@ const DEFAULT_IMAGE = "img/default.jpg";
 
 /* ===== INIT ===== */
 document.addEventListener("DOMContentLoaded", () => {
-    createImageModal();
-
     fetch(CSV_URL)
         .then(res => res.text())
         .then(text => {
@@ -82,45 +80,31 @@ function driveToImageUrl(url) {
     return clean;
 }
 
-/* ===== MODAL + FULLSCREEN ===== */
-function createImageModal() {
-    const modal = document.createElement("div");
-    modal.className = "image-modal";
-    modal.innerHTML = `
-        <span class="close">&times;</span>
-        <img src="" alt="">
-    `;
-    document.body.appendChild(modal);
+/* ===== MODAL ===== */
+const modal = document.getElementById("imageModal");
+const modalImg = document.getElementById("modalImage");
+const closeBtn = document.getElementById("closeModal");
 
-    const img = modal.querySelector("img");
-    const close = modal.querySelector(".close");
+/* cerrar con X */
+closeBtn.addEventListener("click", closeModal);
 
-    close.onclick = () => closeModal(modal);
-    modal.onclick = (e) => {
-        if (e.target === modal) closeModal(modal);
-    };
+/* cerrar tocando afuera de la imagen */
+modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+        closeModal();
+    }
+});
 
-    window.openImageModal = (src) => {
-        img.src = src;
-        modal.classList.add("active");
-        document.body.classList.add("modal-open");
-
-        // FULLSCREEN REAL (mobile)
-        if (modal.requestFullscreen) {
-            modal.requestFullscreen();
-        } else if (modal.webkitRequestFullscreen) {
-            modal.webkitRequestFullscreen(); // iOS
-        }
-    };
+function openModal(src) {
+    modalImg.src = src;
+    modal.classList.add("active");
+    document.body.classList.add("modal-open");
 }
 
-function closeModal(modal) {
+function closeModal() {
     modal.classList.remove("active");
+    modalImg.src = "";
     document.body.classList.remove("modal-open");
-
-    if (document.fullscreenElement) {
-        document.exitFullscreen();
-    }
 }
 
 /* ===== RENDER ===== */
@@ -150,10 +134,10 @@ function renderMenu(items) {
         const img = producto.querySelector("img");
         img.onerror = () => img.src = DEFAULT_IMAGE;
 
-        img.onclick = (e) => {
+        img.addEventListener("click", (e) => {
             e.stopPropagation();
-            window.openImageModal(img.src);
-        };
+            openModal(imgSrc);
+        });
 
         contenedor.appendChild(producto);
     });
