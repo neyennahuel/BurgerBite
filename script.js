@@ -1,5 +1,6 @@
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8eU89XL7ucxbUaggrjgyWlnT6oDKMGRCL6SO7ywbM-ObzBueYGiVtYMHUx7PJ1fqJIrcrcuGcTG2g/pub?gid=0&single=true&output=csv";
 const DEFAULT_IMAGE = "img/default.jpg";
+const WHATSAPP_NUMBER = "5492634546537";
 
 /* ===== INIT ===== */
 document.addEventListener("DOMContentLoaded", () => {
@@ -80,19 +81,28 @@ function driveToImageUrl(url) {
     return clean;
 }
 
+function buildWhatsappLink(item) {
+    const message = `
+Hola 👋
+Quiero pedir:
+
+🍔 *${item.Nombre}*
+💰 Precio: $${item.Precio}
+📂 Categoría: ${item.Categoria}
+    `.trim();
+
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
 /* ===== MODAL ===== */
 const modal = document.getElementById("imageModal");
 const modalImg = document.getElementById("modalImage");
 const closeBtn = document.getElementById("closeModal");
 
-/* cerrar con X */
 closeBtn.addEventListener("click", closeModal);
 
-/* cerrar tocando afuera de la imagen */
 modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-        closeModal();
-    }
+    if (e.target === modal) closeModal();
 });
 
 function openModal(src) {
@@ -122,12 +132,22 @@ function renderMenu(items) {
         const producto = document.createElement("div");
         producto.className = "producto";
 
+        const whatsappLink = buildWhatsappLink(item);
+
         producto.innerHTML = `
             <img src="${imgSrc}" alt="${item.Nombre}">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
                 <span class="precio">$${item.Precio}</span>
+
+                <a 
+                    href="${whatsappLink}"
+                    target="_blank"
+                    class="btn-pedir"
+                >
+                    Pedir por WhatsApp
+                </a>
             </div>
         `;
 
