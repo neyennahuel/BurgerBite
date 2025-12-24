@@ -1,329 +1,195 @@
-/* ================================================= */
-/* ==================== RESET ====================== */
-/* ================================================= */
-
+/* ===== RESET ===== */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
 }
 
-/* ================================================= */
-/* ===================== BODY ====================== */
-/* ================================================= */
-
 body {
-    background-color: #121212;
-    color: #f5f5f5;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #0f0f0f;
+    color: #ffffff;
+    padding-bottom: 120px;
+}
+
+/* ===== HEADER ===== */
+header {
+    text-align: center;
     padding: 20px;
 }
 
-/* bloquear scroll cuando modal activo */
-body.modal-open {
-    overflow: hidden;
-    height: 100%;
-}
-
-/* ================================================= */
-/* ==================== HEADER ===================== */
-/* ================================================= */
-
-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-header .logo {
+.logo {
     width: 120px;
-    max-width: 60%;
-    margin: 0 auto 14px;
-    display: block;
-
-    opacity: 0;
-    transform: translateY(12px);
-    animation: logoFadeIn 0.8s ease-out forwards;
+    border-radius: 12px;
+    margin-bottom: 10px;
 }
 
 header h1 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 2.6rem;
-    margin-bottom: 6px;
-    letter-spacing: 1.5px;
+    font-family: "Oswald", sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 1px;
 }
 
 header p {
-    color: #bbb;
-    font-size: 1rem;
-    font-weight: 300;
+    opacity: 0.8;
 }
 
-/* animación logo */
-@keyframes logoFadeIn {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ================================================= */
-/* ================== SECCIONES ==================== */
-/* ================================================= */
-
+/* ===== SECCIONES ===== */
 section {
-    margin-bottom: 50px;
+    margin: 30px 16px;
 }
 
 section h2 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.7rem;
-    margin-bottom: 20px;
-    border-left: 5px solid #e63946;
+    font-family: "Oswald", sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 14px;
+    border-left: 5px solid #25d366;
     padding-left: 10px;
-    letter-spacing: 1px;
-    color: #fff;
 }
-
-/* ================================================= */
-/* ===================== GRID ====================== */
-/* ================================================= */
 
 .productos {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
 }
 
-/* ================================================= */
-/* ================= CARD PRODUCTO ================= */
-/* ================================================= */
-
+/* ===== PRODUCTO ===== */
 .producto {
-    background-color: #1e1e1e;
-    border-radius: 12px;
-    display: flex;
-    gap: 15px;
-    padding: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: #1a1a1a;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .producto:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
 }
 
-/* imagen */
 .producto img {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: 180px;
     object-fit: cover;
-    border-radius: 10px;
-    flex-shrink: 0;
     cursor: pointer;
 }
 
-/* info */
-.producto .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.info {
+    padding: 14px;
 }
 
-.producto h3 {
-    font-family: 'Oswald', sans-serif;
-    font-size: 1.2rem;
+.info h3 {
+    font-size: 1.1rem;
     margin-bottom: 6px;
-    letter-spacing: 0.5px;
-    color: #fff;
 }
 
-.producto p {
+.info p {
     font-size: 0.9rem;
-    font-weight: 300;
-    color: #ccc;
+    opacity: 0.8;
     margin-bottom: 10px;
-    line-height: 1.4;
 }
 
-.producto .precio {
-    font-family: 'Oswald', sans-serif;
-    font-weight: 600;
-    font-size: 1.15rem;
-    color: #e63946;
+.precio {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #25d366;
+    display: block;
+    margin-bottom: 12px;
 }
 
-/* ================================================= */
-/* =================== RESPONSIVE ================== */
-/* ================================================= */
-
-@media (min-width: 600px) {
-    .productos {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    header .logo {
-        width: 140px;
-    }
-}
-
-@media (min-width: 900px) {
-    .productos {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    header .logo {
-        width: 160px;
-    }
-}
-
-/* ================================================= */
-/* ============ MODAL FULLSCREEN SUAVE ============== */
-/* ================================================= */
-
-.image-modal {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100svh;
-
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-
+/* ===== CONTROLES DE CANTIDAD ===== */
+.cantidad-control {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 14px;
+}
 
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
+.cantidad-control button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background-color: #25d366;
+    color: #000;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
 
-    z-index: 9999;
+.cantidad-control button:hover {
+    background-color: #1ebe5d;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4);
+}
+
+.cantidad-control button:active {
+    transform: scale(0.9);
+}
+
+.cantidad {
+    min-width: 24px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* ===== MODAL IMAGEN ===== */
+.image-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 .image-modal.active {
-    opacity: 1;
-    pointer-events: auto;
+    display: flex;
 }
 
 .image-modal img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-
-    transform: scale(0.92);
-    transition: transform 0.25s ease;
-}
-
-.image-modal.active img {
-    transform: scale(1);
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
 }
 
 .image-modal .close {
-    position: fixed;
-    top: 16px;
-    right: 18px;
-    font-size: 32px;
-    color: #fff;
+    position: absolute;
+    top: 20px;
+    right: 26px;
+    font-size: 2rem;
     cursor: pointer;
-    z-index: 10000;
 }
 
-/* ================================================= */
-/* =============== WHATSAPP FLOAT ================== */
-/* ================================================= */
-
+/* ===== WHATSAPP FLOAT ===== */
 .whatsapp-float {
     position: fixed;
-    bottom: 18px;
-    right: 18px;
-    width: 56px;
-    height: 56px;
+    bottom: 24px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
     background-color: #25d366;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-    z-index: 10000;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    z-index: 999;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .whatsapp-float:hover {
     transform: scale(1.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
 .whatsapp-float img {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
 }
 
-/* mobile */
-@media (max-width: 480px) {
-    .whatsapp-float {
-        width: 52px;
-        height: 52px;
-    }
-    .whatsapp-float img {
-        width: 26px;
-        height: 26px;
-    }
-}
-
-/* desktop */
-@media (min-width: 768px) {
-    .whatsapp-float {
-        width: 44px;
-        height: 44px;
-    }
-    .whatsapp-float img {
-        width: 22px;
-        height: 22px;
-    }
-}
-
-/* ================================================= */
-/* ============ PROMOS — AGRESIVO REAL ============= */
-/* ================================================= */
-
-#promos h2 {
-    font-size: 2.2rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #e63946;
-}
-
-/* card promo */
-#promos .producto {
-    border: 2px solid #e63946;
-    background: linear-gradient(145deg, #1f1f1f, #151515);
-    position: relative;
-}
-
-/* badge PROMO */
-#promos .producto::before {
-    content: "PROMO";
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: #e63946;
-    color: #fff;
-    font-family: 'Oswald', sans-serif;
-    font-size: 0.75rem;
-    padding: 6px 10px;
-    border-radius: 6px;
-    letter-spacing: 1px;
-}
-
-/* nombre promo */
-#promos .producto h3 {
-    font-size: 1.45rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* precio promo */
-#promos .producto .precio {
-    font-size: 1.7rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
+/* ===== UTIL ===== */
+body.modal-open {
+    overflow: hidden;
 }
