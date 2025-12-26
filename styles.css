@@ -342,3 +342,96 @@ section h2 {
     font-size: 1.8rem;
     font-weight: 700;
 }
+/* ================= MODAL DELIVERY ================= */
+
+.delivery-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 10001;
+}
+
+.delivery-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.delivery-box {
+    background: #1e1e1e;
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    animation: popIn 0.25s ease;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.92);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.delivery-box h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.delivery-text {
+    color: #cccccc;
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+}
+
+.delivery-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.btn-delivery {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-delivery.yes {
+    background: #25d366;
+    color: #000;
+}
+
+.btn-delivery.no {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+.btn-delivery:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+}
+
+.delivery-note {
+    font-size: 0.75rem;
+    color: #aaaaaa;
+    line-height: 1.3;
+}

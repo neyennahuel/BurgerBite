@@ -111,7 +111,7 @@ function updateCart(item, delta) {
     return cart[key]?.cantidad || 0;
 }
 
-/* ================= MODAL ================= */
+/* ================= MODAL IMAGEN ================= */
 const modal = document.getElementById("imageModal");
 const modalImg = document.getElementById("modalImage");
 const closeBtn = document.getElementById("closeModal");
@@ -175,62 +175,66 @@ function renderMenu(items) {
         });
 
         const spanCantidad = producto.querySelector(".cantidad");
-        const btnMas = producto.querySelector(".mas");
-        const btnMenos = producto.querySelector(".menos");
 
-        btnMas.addEventListener("click", () => {
-            const nuevaCantidad = updateCart(item, 1);
-            spanCantidad.textContent = nuevaCantidad;
+        producto.querySelector(".mas").addEventListener("click", () => {
+            spanCantidad.textContent = updateCart(item, 1);
         });
 
-        btnMenos.addEventListener("click", () => {
-            const nuevaCantidad = updateCart(item, -1);
-            spanCantidad.textContent = nuevaCantidad;
+        producto.querySelector(".menos").addEventListener("click", () => {
+            spanCantidad.textContent = updateCart(item, -1);
         });
 
         contenedor.appendChild(producto);
     });
 }
 
-/* ================= WHATSAPP ================= */
+/* ================= WHATSAPP + DELIVERY MODAL ================= */
 function initWhatsappButton() {
     const btn = document.querySelector(".whatsapp-float");
+    const deliveryModal = document.getElementById("deliveryModal");
+    const btnConDelivery = document.getElementById("btnConDelivery");
+    const btnSinDelivery = document.getElementById("btnSinDelivery");
 
     btn.addEventListener("click", e => {
         e.preventDefault();
 
-        const cart = getCart();
-        const items = Object.values(cart);
-
+        const items = Object.values(getCart());
         if (items.length === 0) {
             alert("No agregaste ningún producto al pedido.");
             return;
         }
 
-        const quiereDelivery = confirm(
-            "¿Querés el pedido con delivery?\n\n(El precio con delivery se confirma luego de pasar la ubicación)"
-        );
+        deliveryModal.classList.add("active");
+        document.body.classList.add("modal-open");
+    });
 
-        let total = 0;
-        let detalle = "";
+    btnConDelivery.addEventListener("click", () => enviarPedido(true));
+    btnSinDelivery.addEventListener("click", () => enviarPedido(false));
+}
 
-        items.forEach(item => {
-            total += item.precio * item.cantidad;
-            detalle += `• ${item.cantidad} x ${item.nombre}\n`;
-        });
+function enviarPedido(conDelivery) {
+    const cart = getCart();
+    const items = Object.values(cart);
 
-        const mensaje = `
+    let total = 0;
+    let detalle = "";
+
+    items.forEach(item => {
+        total += item.precio * item.cantidad;
+        detalle += `• ${item.cantidad} x ${item.nombre}\n`;
+    });
+
+    const mensaje = `
 Hola 👋
 Quería hacer el siguiente pedido:
 
 ${detalle}
 Total: $${total}
-Delivery: ${quiereDelivery ? "Sí" : "No"}
-        `.trim();
+${conDelivery ? "Con delivery (el precio se confirma luego de pasar la ubicación)" : "Sin delivery"}
+    `.trim();
 
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+    localStorage.removeItem(CART_KEY);
 
-        localStorage.removeItem(CART_KEY);
-        window.location.href = url;
-    });
+    window.location.href =
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }

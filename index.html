@@ -14,54 +14,67 @@
 </head>
 <body>
 
-    <header>
-        <!-- LOGO -->
-        <img src="img/logo.jpg" alt="Burgerbite" class="logo">
-        <h1>Burgerbite</h1>
-        <p>Nuestra carta</p>
-    </header>
+<header>
+    <img src="img/logo.jpg" alt="Burgerbite" class="logo">
+    <h1>Burgerbite</h1>
+    <p>Nuestra carta</p>
+</header>
 
-    <main>
-        <section id="hamburguesas">
-            <h2>Hamburguesas</h2>
-            <div class="productos"></div>
-        </section>
+<main>
+    <section id="hamburguesas">
+        <h2>Hamburguesas</h2>
+        <div class="productos"></div>
+    </section>
 
-        <section id="papas">
-            <h2>Papas</h2>
-            <div class="productos"></div>
-        </section>
+    <section id="papas">
+        <h2>Papas</h2>
+        <div class="productos"></div>
+    </section>
 
-        <section id="bebidas">
-            <h2>Bebidas</h2>
-            <div class="productos"></div>
-        </section>
+    <section id="bebidas">
+        <h2>Bebidas</h2>
+        <div class="productos"></div>
+    </section>
 
-        <section id="promos">
-            <h2>Promos</h2>
-            <div class="productos"></div>
-        </section>
-    </main>
+    <section id="promos">
+        <h2>Promos</h2>
+        <div class="productos"></div>
+    </section>
+</main>
 
-    <!-- MODAL IMAGEN -->
-    <div class="image-modal" id="imageModal">
-        <span class="close" id="closeModal">&times;</span>
-        <img id="modalImage" src="" alt="">
+<!-- MODAL IMAGEN -->
+<div class="image-modal" id="imageModal">
+    <span class="close" id="closeModal">&times;</span>
+    <img id="modalImage" src="" alt="">
+</div>
+
+<!-- MODAL DELIVERY -->
+<div class="delivery-modal" id="deliveryModal">
+    <div class="delivery-box">
+        <h3>¿Cómo querés tu pedido?</h3>
+        <p class="aclaracion">
+            El precio con delivery se confirma luego de pasar la ubicación
+        </p>
+
+        <div class="delivery-actions">
+            <button id="btnSinDelivery">Sin delivery</button>
+            <button id="btnConDelivery">Con delivery</button>
+        </div>
     </div>
+</div>
 
-    <!-- BOTÓN WHATSAPP OFICIAL -->
-    <a
-        href="https://wa.me/5492634546537"
-        class="whatsapp-float"
-        target="_blank"
-        aria-label="WhatsApp"
+<!-- BOTÓN WHATSAPP -->
+<a
+    href="#"
+    class="whatsapp-float"
+    aria-label="WhatsApp"
+>
+    <img
+        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+        alt="WhatsApp"
     >
-        <img
-            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-            alt="WhatsApp"
-        >
-    </a>
+</a>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
