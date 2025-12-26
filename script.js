@@ -193,7 +193,7 @@ function initWhatsappButton() {
     const btn = document.querySelector(".whatsapp-float");
     const deliveryModal = document.getElementById("deliveryModal");
     const btnConDelivery = document.getElementById("btnConDelivery");
-    const btnSinDelivery = document.getElementById("btnSinDelivery");
+    const btnTakeAway = document.getElementById("btnTakeAway");
 
     btn.addEventListener("click", e => {
         e.preventDefault();
@@ -208,11 +208,11 @@ function initWhatsappButton() {
         document.body.classList.add("modal-open");
     });
 
-    btnConDelivery.addEventListener("click", () => enviarPedido(true));
-    btnSinDelivery.addEventListener("click", () => enviarPedido(false));
+    btnConDelivery.addEventListener("click", () => enviarPedido("Con delivery"));
+    btnTakeAway.addEventListener("click", () => enviarPedido("Take away"));
 }
 
-function enviarPedido(conDelivery) {
+function enviarPedido(tipoEntrega) {
     const cart = getCart();
     const items = Object.values(cart);
 
@@ -230,7 +230,7 @@ Quería hacer el siguiente pedido:
 
 ${detalle}
 Total: $${total}
-${conDelivery ? "Con delivery (el precio se confirma luego de pasar la ubicación)" : "Sin delivery"}
+Entrega: ${tipoEntrega}
     `.trim();
 
     localStorage.removeItem(CART_KEY);
