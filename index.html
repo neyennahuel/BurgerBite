@@ -52,14 +52,26 @@
 <div class="delivery-modal" id="deliveryModal">
     <div class="delivery-box">
         <h3>¿Cómo querés tu pedido?</h3>
-        <p class="aclaracion">
+
+        <p class="delivery-text">
             El precio con delivery se confirma luego de pasar la ubicación
         </p>
 
         <div class="delivery-actions">
-            <button id="btnSinDelivery">Sin delivery</button>
-            <button id="btnConDelivery">Con delivery</button>
+            <button id="btnSinDelivery" class="btn-delivery no">
+                <span class="icon">🏪</span>
+                <span class="text">Sin delivery</span>
+            </button>
+
+            <button id="btnConDelivery" class="btn-delivery yes">
+                <span class="icon">🛵</span>
+                <span class="text">Con delivery</span>
+            </button>
         </div>
+
+        <p class="delivery-note">
+            Podés confirmar el tipo de entrega antes de enviar el pedido
+        </p>
     </div>
 </div>
 
