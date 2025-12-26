@@ -12,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
             renderMenu(data);
             initWhatsappButton();
         })
-        .catch(() => {
-            alert("No se pudo cargar la carta.");
-        });
+        .catch(() => alert("No se pudo cargar la carta."));
 });
 
 /* ================= CSV ================= */
@@ -69,7 +67,7 @@ function normalize(text) {
 }
 
 function driveToImageUrl(url) {
-    if (!url) return "";
+    if (!url) return DEFAULT_IMAGE;
     const clean = url.replace(/^"+|"+$/g, "").trim();
 
     if (clean.includes("lh3.googleusercontent.com")) return clean;
@@ -144,9 +142,7 @@ function renderMenu(items) {
         const contenedor = document.querySelector(`#${categoriaId} .productos`);
         if (!contenedor) return;
 
-        let imgSrc = DEFAULT_IMAGE;
-        if (item.Imagen) imgSrc = driveToImageUrl(item.Imagen);
-
+        const imgSrc = item.Imagen ? driveToImageUrl(item.Imagen) : DEFAULT_IMAGE;
         const cantidadActual = cart[item.Nombre]?.cantidad || 0;
 
         const producto = document.createElement("div");
@@ -190,16 +186,15 @@ function renderMenu(items) {
 
 /* ================= WHATSAPP + DELIVERY MODAL ================= */
 function initWhatsappButton() {
-    const btn = document.querySelector(".whatsapp-float");
+    const btnWA = document.querySelector(".whatsapp-float");
     const deliveryModal = document.getElementById("deliveryModal");
     const btnConDelivery = document.getElementById("btnConDelivery");
     const btnTakeAway = document.getElementById("btnTakeAway");
 
-    btn.addEventListener("click", e => {
+    btnWA.addEventListener("click", e => {
         e.preventDefault();
 
-        const items = Object.values(getCart());
-        if (items.length === 0) {
+        if (!Object.keys(getCart()).length) {
             alert("No agregaste ningún producto al pedido.");
             return;
         }
@@ -213,8 +208,7 @@ function initWhatsappButton() {
 }
 
 function enviarPedido(tipoEntrega) {
-    const cart = getCart();
-    const items = Object.values(cart);
+    const items = Object.values(getCart());
 
     let total = 0;
     let detalle = "";
@@ -231,7 +225,7 @@ Quería hacer el siguiente pedido:
 ${detalle}
 Total: $${total}
 Entrega: ${tipoEntrega}
-    `.trim();
+`.trim();
 
     localStorage.removeItem(CART_KEY);
 

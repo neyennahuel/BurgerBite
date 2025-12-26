@@ -1,139 +1,90 @@
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8eU89XL7ucxbUaggrjgyWlnT6oDKMGRCL6SO7ywbM-ObzBueYGiVtYMHUx7PJ1fqJIrcrcuGcTG2g/pub?gid=0&single=true&output=csv";
-const DEFAULT_IMAGE = "img/default.jpg";
-const WHATSAPP_NUMBER = "5492634546537";
-const CART_KEY = "burgerbite_cart";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta - Burgerbite</title>
 
-/* ================= INIT ================= */
-document.addEventListener("DOMContentLoaded", () => {
-    fetch(CSV_URL)
-        .then(res => res.text())
-        .then(text => {
-            renderMenu(parseCSV(text));
-            initWhatsappButton();
-        })
-        .catch(() => alert("No se pudo cargar la carta."));
-});
+    <!-- TIPOGRAFÍA PARA PROMOS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
-/* ================= CSV ================= */
-function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let current = "";
-    let inQuotes = false;
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-    for (let char of text) {
-        if (char === '"') inQuotes = !inQuotes;
-        else if (char === "," && !inQuotes) {
-            row.push(current.trim());
-            current = "";
-        } else if ((char === "\n" || char === "\r") && !inQuotes) {
-            if (current || row.length) rows.push([...row, current.trim()]);
-            row = [];
-            current = "";
-        } else current += char;
-    }
+<header>
+    <img src="img/logo.jpg" alt="Burgerbite" class="logo">
+    <h1>Burgerbite</h1>
+    <p>Nuestra carta</p>
+</header>
 
-    if (current || row.length) rows.push([...row, current.trim()]);
+<main>
+    <section id="hamburguesas">
+        <h2>Hamburguesas</h2>
+        <div class="productos"></div>
+    </section>
 
-    const headers = rows.shift();
-    return rows.map(cols =>
-        Object.fromEntries(headers.map((h, i) => [h.trim(), cols[i] || ""]))
-    );
-}
+    <section id="papas">
+        <h2>Papas</h2>
+        <div class="productos"></div>
+    </section>
 
-/* ================= HELPERS ================= */
-const normalize = t =>
-    t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    <section id="bebidas">
+        <h2>Bebidas</h2>
+        <div class="productos"></div>
+    </section>
 
-const driveToImageUrl = url =>
-    !url ? DEFAULT_IMAGE :
-    url.includes("lh3.googleusercontent.com") ? url :
-    url.includes("id=") ? `https://lh3.googleusercontent.com/d/${url.split("id=")[1]}` :
-    url;
+    <section id="promos">
+        <h2>Promos</h2>
+        <div class="productos"></div>
+    </section>
+</main>
 
-/* ================= CART ================= */
-const getCart = () => JSON.parse(localStorage.getItem(CART_KEY)) || {};
-const saveCart = cart => localStorage.setItem(CART_KEY, JSON.stringify(cart));
+<!-- MODAL IMAGEN -->
+<div class="image-modal" id="imageModal">
+    <span class="close" id="closeModal">&times;</span>
+    <img id="modalImage" src="" alt="">
+</div>
 
-function updateCart(item, delta) {
-    const cart = getCart();
-    cart[item.Nombre] ??= { nombre: item.Nombre, precio: +item.Precio, cantidad: 0 };
-    cart[item.Nombre].cantidad += delta;
-    if (cart[item.Nombre].cantidad <= 0) delete cart[item.Nombre];
-    saveCart(cart);
-    return cart[item.Nombre]?.cantidad || 0;
-}
+<!-- MODAL DELIVERY -->
+<div class="delivery-modal" id="deliveryModal">
+    <div class="delivery-box">
+        <h3>¿Cómo querés tu pedido?</h3>
 
-/* ================= RENDER ================= */
-function renderMenu(items) {
-    const cart = getCart();
+        <p class="delivery-text">
+            El precio con delivery se confirma luego de pasar la ubicación
+        </p>
 
-    items.forEach(item => {
-        if (item.Disponible !== "TRUE") return;
+        <div class="delivery-actions">
+            <!-- TAKE AWAY -->
+            <button id="btnTakeAway" class="btn-delivery no">
+                <span class="icon">🏪</span>
+                <span class="text">Take away</span>
+            </button>
 
-        const contenedor = document.querySelector(`#${normalize(item.Categoria)} .productos`);
-        if (!contenedor) return;
+            <!-- CON DELIVERY -->
+            <button id="btnConDelivery" class="btn-delivery yes">
+                <span class="icon">🛵</span>
+                <span class="text">Con delivery</span>
+            </button>
+        </div>
 
-        const producto = document.createElement("div");
-        producto.className = "producto";
+        <p class="delivery-note">
+            Podés confirmar el tipo de entrega antes de enviar el pedido
+        </p>
+    </div>
+</div>
 
-        producto.innerHTML = `
-            <img src="${driveToImageUrl(item.Imagen)}" alt="${item.Nombre}">
-            <div class="info">
-                <h3>${item.Nombre}</h3>
-                <p>${item.Descripcion}</p>
-                <span class="precio">$${item.Precio}</span>
-                <div class="cantidad-control">
-                    <button class="menos">−</button>
-                    <span class="cantidad">${cart[item.Nombre]?.cantidad || 0}</span>
-                    <button class="mas">+</button>
-                </div>
-            </div>
-        `;
+<!-- BOTÓN WHATSAPP -->
+<a href="#" class="whatsapp-float" aria-label="WhatsApp">
+    <img
+        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+        alt="WhatsApp"
+    >
+</a>
 
-        const span = producto.querySelector(".cantidad");
-        producto.querySelector(".mas").onclick = () => span.textContent = updateCart(item, 1);
-        producto.querySelector(".menos").onclick = () => span.textContent = updateCart(item, -1);
-
-        contenedor.appendChild(producto);
-    });
-}
-
-/* ================= WHATSAPP ================= */
-function initWhatsappButton() {
-    const modal = document.getElementById("deliveryModal");
-    const btnWA = document.querySelector(".whatsapp-float");
-
-    btnWA.onclick = e => {
-        e.preventDefault();
-        if (!Object.keys(getCart()).length) return alert("No agregaste productos.");
-        modal.classList.add("active");
-        document.body.classList.add("modal-open");
-    };
-
-    document.getElementById("btnDelivery").onclick = () => enviarPedido("Con delivery");
-    document.getElementById("btnTakeAway").onclick = () => enviarPedido("Take away");
-}
-
-function enviarPedido(tipoEntrega) {
-    const items = Object.values(getCart());
-    let total = 0;
-    let detalle = "";
-
-    items.forEach(i => {
-        total += i.precio * i.cantidad;
-        detalle += `• ${i.cantidad} x ${i.nombre}\n`;
-    });
-
-    const mensaje = `
-Hola 👋
-Quería hacer el siguiente pedido:
-
-${detalle}
-Total: $${total}
-Entrega: ${tipoEntrega}
-`.trim();
-
-    localStorage.removeItem(CART_KEY);
-    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
-}
+<script src="script.js"></script>
+</body>
+</html>
