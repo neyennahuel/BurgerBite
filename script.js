@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = parseCSV(text);
             renderMenu(data);
             initWhatsappButton();
+            initPedidoModal();
         })
         .catch(() => {
             alert("No se pudo cargar la carta.");
@@ -27,9 +28,8 @@ function parseCSV(text) {
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
 
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === "," && !inQuotes) {
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === "," && !inQuotes) {
             row.push(current.trim());
             current = "";
         } else if ((char === "\n" || char === "\r") && !inQuotes) {
@@ -39,9 +39,7 @@ function parseCSV(text) {
             }
             row = [];
             current = "";
-        } else {
-            current += char;
-        }
+        } else current += char;
     }
 
     if (current || row.length) {
@@ -53,29 +51,22 @@ function parseCSV(text) {
 
     return rows.map(cols => {
         const item = {};
-        headers.forEach((h, i) => {
-            item[h.trim()] = cols[i] || "";
-        });
+        headers.forEach((h, i) => item[h.trim()] = cols[i] || "");
         return item;
     });
 }
 
 /* ================= HELPERS ================= */
 function normalize(text) {
-    return text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+    return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function driveToImageUrl(url) {
     if (!url) return "";
     const clean = url.replace(/^"+|"+$/g, "").trim();
-
     if (clean.includes("lh3.googleusercontent.com")) return clean;
     if (clean.includes("id=")) {
-        const id = clean.split("id=")[1];
-        return `https://lh3.googleusercontent.com/d/${id}`;
+        return `https://lh3.googleusercontent.com/d/${clean.split("id=")[1]}`;
     }
     return clean;
 }
@@ -103,32 +94,25 @@ function updateCart(item, delta) {
 
     cart[key].cantidad += delta;
 
-    if (cart[key].cantidad <= 0) {
-        delete cart[key];
-    }
+    if (cart[key].cantidad <= 0) delete cart[key];
 
     saveCart(cart);
     return cart[key]?.cantidad || 0;
 }
 
-/* ================= MODAL ================= */
-const modal = document.getElementById("imageModal");
+/* ================= MODAL IMAGEN ================= */
+const modalImgBox = document.getElementById("imageModal");
 const modalImg = document.getElementById("modalImage");
-const closeBtn = document.getElementById("closeModal");
-
-closeBtn.addEventListener("click", closeModal);
-modal.addEventListener("click", e => {
-    if (e.target === modal) closeModal();
-});
+document.getElementById("closeModal").onclick = () => closeImg();
 
 function openModal(src) {
     modalImg.src = src;
-    modal.classList.add("active");
+    modalImgBox.classList.add("active");
     document.body.classList.add("modal-open");
 }
 
-function closeModal() {
-    modal.classList.remove("active");
+function closeImg() {
+    modalImgBox.classList.remove("active");
     modalImg.src = "";
     document.body.classList.remove("modal-open");
 }
@@ -140,97 +124,91 @@ function renderMenu(items) {
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
 
-        const categoriaId = normalize(item.Categoria);
-        const contenedor = document.querySelector(`#${categoriaId} .productos`);
-        if (!contenedor) return;
+        const cont = document.querySelector(`#${normalize(item.Categoria)} .productos`);
+        if (!cont) return;
 
-        let imgSrc = DEFAULT_IMAGE;
-        if (item.Imagen) imgSrc = driveToImageUrl(item.Imagen);
+        const imgSrc = item.Imagen ? driveToImageUrl(item.Imagen) : DEFAULT_IMAGE;
+        const cant = cart[item.Nombre]?.cantidad || 0;
 
-        const cantidadActual = cart[item.Nombre]?.cantidad || 0;
-
-        const producto = document.createElement("div");
-        producto.className = "producto";
-
-        producto.innerHTML = `
+        const div = document.createElement("div");
+        div.className = "producto";
+        div.innerHTML = `
             <img src="${imgSrc}" alt="${item.Nombre}">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
                 <span class="precio">$${item.Precio}</span>
-
                 <div class="cantidad-control">
                     <button class="menos">−</button>
-                    <span class="cantidad">${cantidadActual}</span>
+                    <span class="cantidad">${cant}</span>
                     <button class="mas">+</button>
                 </div>
             </div>
         `;
 
-        const img = producto.querySelector("img");
+        const img = div.querySelector("img");
         img.onerror = () => img.src = DEFAULT_IMAGE;
-        img.addEventListener("click", e => {
-            e.stopPropagation();
-            openModal(imgSrc);
-        });
+        img.onclick = () => openModal(imgSrc);
 
-        const spanCantidad = producto.querySelector(".cantidad");
-        const btnMas = producto.querySelector(".mas");
-        const btnMenos = producto.querySelector(".menos");
+        const span = div.querySelector(".cantidad");
+        div.querySelector(".mas").onclick = () => span.textContent = updateCart(item, 1);
+        div.querySelector(".menos").onclick = () => span.textContent = updateCart(item, -1);
 
-        btnMas.addEventListener("click", () => {
-            const nuevaCantidad = updateCart(item, 1);
-            spanCantidad.textContent = nuevaCantidad;
-        });
-
-        btnMenos.addEventListener("click", () => {
-            const nuevaCantidad = updateCart(item, -1);
-            spanCantidad.textContent = nuevaCantidad;
-        });
-
-        contenedor.appendChild(producto);
+        cont.appendChild(div);
     });
 }
 
-/* ================= WHATSAPP ================= */
+/* ================= PEDIDO MODAL ================= */
+const pedidoModal = document.getElementById("pedidoModal");
+const confirmarBtn = document.getElementById("confirmarPedido");
+const cancelarBtn = document.getElementById("cancelarPedido");
+
 function initWhatsappButton() {
-    const btn = document.querySelector(".whatsapp-float");
-
-    btn.addEventListener("click", e => {
+    document.querySelector(".whatsapp-float").onclick = e => {
         e.preventDefault();
-
-        const cart = getCart();
-        const items = Object.values(cart);
-
-        if (items.length === 0) {
+        if (Object.keys(getCart()).length === 0) {
             alert("No agregaste ningún producto al pedido.");
             return;
         }
+        pedidoModal.classList.add("active");
+        document.body.classList.add("modal-open");
+    };
+}
 
-        const quiereDelivery = confirm(
-            "¿Querés el pedido con delivery?\n\n(El precio con delivery se confirma luego de pasar la ubicación)"
-        );
+function initPedidoModal() {
+    cancelarBtn.onclick = () => closePedido();
+    confirmarBtn.onclick = () => enviarPedido();
+}
 
-        let total = 0;
-        let detalle = "";
+function closePedido() {
+    pedidoModal.classList.remove("active");
+    document.body.classList.remove("modal-open");
+}
 
-        items.forEach(item => {
-            total += item.precio * item.cantidad;
-            detalle += `• ${item.cantidad} x ${item.nombre}\n`;
-        });
+function enviarPedido() {
+    const cart = Object.values(getCart());
+    let total = 0;
+    let detalle = "";
 
-        const mensaje = `
+    cart.forEach(i => {
+        total += i.precio * i.cantidad;
+        detalle += `• ${i.cantidad} x ${i.nombre}\n`;
+    });
+
+    const delivery = document.querySelector("input[name='delivery']:checked").value;
+    const nota = document.getElementById("notaPedido").value.trim();
+
+    let mensaje = `
 Hola 👋
 Quería hacer el siguiente pedido:
 
 ${detalle}
 Total: $${total}
-Delivery: ${quiereDelivery ? "Sí" : "No"}
-        `.trim();
+Delivery: ${delivery}
+    `.trim();
 
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+    if (nota) mensaje += `\nNota: ${nota}`;
 
-        localStorage.removeItem(CART_KEY);
-        window.location.href = url;
-    });
+    localStorage.removeItem(CART_KEY);
+    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }
