@@ -9,6 +9,8 @@ const CONFIG = {
     EXTRA_TRIPLE: 0
 };
 
+let pendingBurger = null;
+
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
     fetch(CSV_URL)
@@ -17,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = parseCSV(text);
             loadConfig(data);
             renderMenu(data);
+            initMeatModal();
             initWhatsappButton();
         })
         .catch(() => alert("No se pudo cargar la carta."));
@@ -68,10 +71,7 @@ function normalize(text) {
 
 function driveToImageUrl(url) {
     if (!url) return DEFAULT_IMAGE;
-    const clean = url.replace(/^"+|"+$/g, "").trim();
-    if (clean.includes("lh3.googleusercontent.com")) return clean;
-    if (clean.includes("id=")) return `https://lh3.googleusercontent.com/d/${clean.split("id=")[1]}`;
-    return clean;
+    return url.replace(/^"+|"+$/g, "").trim();
 }
 
 /* ================= CART ================= */
@@ -86,7 +86,7 @@ function saveCart(cart) {
 function addToCart(nombre, precio) {
     const cart = getCart();
     if (!cart[nombre]) cart[nombre] = { nombre, precio, cantidad: 0 };
-    cart[nombre].cantidad += 1;
+    cart[nombre].cantidad++;
     saveCart(cart);
     return cart[nombre].cantidad;
 }
@@ -94,10 +94,39 @@ function addToCart(nombre, precio) {
 function removeFromCart(nombre) {
     const cart = getCart();
     if (!cart[nombre]) return 0;
-    cart[nombre].cantidad -= 1;
+    cart[nombre].cantidad--;
     if (cart[nombre].cantidad <= 0) delete cart[nombre];
     saveCart(cart);
     return cart[nombre]?.cantidad || 0;
+}
+
+/* ================= MODAL CARNES ================= */
+function initMeatModal() {
+    const modal = document.getElementById("meatModal");
+    const cancel = document.getElementById("cancelMeat");
+
+    document.querySelectorAll(".meat-btn").forEach(btn => {
+        btn.onclick = () => {
+            const carnes = Number(btn.dataset.carnes);
+            let extra = 0;
+
+            if (carnes === 2) extra = CONFIG.EXTRA_DOBLE;
+            if (carnes === 3) extra = CONFIG.EXTRA_TRIPLE;
+
+            const nombreFinal = `${pendingBurger.Nombre} (${carnes} carnes)`;
+            const precioFinal = Number(pendingBurger.Precio) + extra;
+
+            addToCart(nombreFinal, precioFinal);
+
+            modal.classList.remove("active");
+            document.body.classList.remove("modal-open");
+        };
+    });
+
+    cancel.onclick = () => {
+        modal.classList.remove("active");
+        document.body.classList.remove("modal-open");
+    };
 }
 
 /* ================= MODAL IMAGEN ================= */
@@ -122,8 +151,6 @@ function closeModal() {
 
 /* ================= RENDER ================= */
 function renderMenu(items) {
-    const cart = getCart();
-
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
         if (normalize(item.Categoria) === "config") return;
@@ -131,12 +158,11 @@ function renderMenu(items) {
         const contenedor = document.querySelector(`#${normalize(item.Categoria)} .productos`);
         if (!contenedor) return;
 
-        const imgSrc = item.Imagen ? driveToImageUrl(item.Imagen) : DEFAULT_IMAGE;
         const producto = document.createElement("div");
         producto.className = "producto";
 
         producto.innerHTML = `
-            <img src="${imgSrc}" alt="${item.Nombre}">
+            <img src="${driveToImageUrl(item.Imagen)}">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
@@ -149,27 +175,13 @@ function renderMenu(items) {
             </div>
         `;
 
-        const img = producto.querySelector("img");
-        img.onerror = () => img.src = DEFAULT_IMAGE;
-        img.onclick = e => { e.stopPropagation(); openModal(imgSrc); };
-
         const span = producto.querySelector(".cantidad");
 
         producto.querySelector(".mas").onclick = () => {
             if (normalize(item.Categoria) === "hamburguesas") {
-                const carnes = prompt("¿Cuántas carnes? (1, 2 o 3)", "1");
-                if (!["1", "2", "3"].includes(carnes)) return;
-
-                let extra = 0;
-                let label = "";
-
-                if (carnes === "2") { extra = CONFIG.EXTRA_DOBLE; label = " (2 carnes)"; }
-                if (carnes === "3") { extra = CONFIG.EXTRA_TRIPLE; label = " (3 carnes)"; }
-
-                span.textContent = addToCart(
-                    item.Nombre + label,
-                    Number(item.Precio) + extra
-                );
+                pendingBurger = item;
+                document.getElementById("meatModal").classList.add("active");
+                document.body.classList.add("modal-open");
             } else {
                 span.textContent = addToCart(item.Nombre, Number(item.Precio));
             }
@@ -177,6 +189,11 @@ function renderMenu(items) {
 
         producto.querySelector(".menos").onclick = () => {
             span.textContent = removeFromCart(item.Nombre);
+        };
+
+        producto.querySelector("img").onclick = e => {
+            e.stopPropagation();
+            openModal(driveToImageUrl(item.Imagen));
         };
 
         contenedor.appendChild(producto);
