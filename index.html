@@ -42,13 +42,39 @@
     </section>
 </main>
 
-<!-- MODAL IMAGEN -->
+<!-- ================= MODAL IMAGEN ================= -->
 <div class="image-modal" id="imageModal">
     <span class="close" id="closeModal">&times;</span>
     <img id="modalImage" src="" alt="">
 </div>
 
-<!-- MODAL DELIVERY -->
+<!-- ================= MODAL SELECCIÓN DE CARNES ================= -->
+<div class="meat-modal" id="meatModal">
+    <div class="meat-box">
+        <h3>¿Cuántas carnes querés?</h3>
+
+        <div class="meat-options">
+            <button class="meat-btn" data-carnes="1">
+                <strong>1 carne</strong>
+                <span class="meat-price">Precio base</span>
+            </button>
+
+            <button class="meat-btn" data-carnes="2">
+                <strong>2 carnes</strong>
+                <span class="meat-price">+ extra doble</span>
+            </button>
+
+            <button class="meat-btn" data-carnes="3">
+                <strong>3 carnes</strong>
+                <span class="meat-price">+ extra triple</span>
+            </button>
+        </div>
+
+        <button class="meat-cancel" id="cancelMeat">Cancelar</button>
+    </div>
+</div>
+
+<!-- ================= MODAL DELIVERY ================= -->
 <div class="delivery-modal" id="deliveryModal">
     <div class="delivery-box">
         <h3>¿Cómo querés tu pedido?</h3>
@@ -58,13 +84,11 @@
         </p>
 
         <div class="delivery-actions">
-            <!-- TAKE AWAY -->
             <button id="btnTakeAway" class="btn-delivery no">
                 <span class="icon">🏪</span>
                 <span class="text">Take away</span>
             </button>
 
-            <!-- CON DELIVERY -->
             <button id="btnConDelivery" class="btn-delivery yes">
                 <span class="icon">🛵</span>
                 <span class="text">Con delivery</span>
@@ -77,7 +101,7 @@
     </div>
 </div>
 
-<!-- BOTÓN WHATSAPP -->
+<!-- ================= BOTÓN WHATSAPP ================= -->
 <a href="#" class="whatsapp-float" aria-label="WhatsApp">
     <img
         src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"

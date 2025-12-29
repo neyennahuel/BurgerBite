@@ -3,17 +3,33 @@ const DEFAULT_IMAGE = "img/default.jpg";
 const WHATSAPP_NUMBER = "5492634546537";
 const CART_KEY = "burgerbite_cart";
 
+let EXTRAS = {
+    doble: 0,
+    triple: 0
+};
+
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
     fetch(CSV_URL)
         .then(res => res.text())
         .then(text => {
             const data = parseCSV(text);
+            cargarExtras(data);
             renderMenu(data);
             initWhatsappButton();
         })
         .catch(() => alert("No se pudo cargar la carta."));
 });
+
+/* ================= CONFIG EXTRAS ================= */
+function cargarExtras(items) {
+    items.forEach(item => {
+        if (item.Categoria === "CONFIG") {
+            if (item.Nombre === "EXTRA_DOBLE") EXTRAS.doble = Number(item.Precio);
+            if (item.Nombre === "EXTRA_TRIPLE") EXTRAS.triple = Number(item.Precio);
+        }
+    });
+}
 
 /* ================= CSV ================= */
 function parseCSV(text) {
@@ -25,9 +41,8 @@ function parseCSV(text) {
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
 
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === "," && !inQuotes) {
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === "," && !inQuotes) {
             row.push(current.trim());
             current = "";
         } else if ((char === "\n" || char === "\r") && !inQuotes) {
@@ -37,9 +52,7 @@ function parseCSV(text) {
             }
             row = [];
             current = "";
-        } else {
-            current += char;
-        }
+        } else current += char;
     }
 
     if (current || row.length) {
@@ -51,31 +64,14 @@ function parseCSV(text) {
 
     return rows.map(cols => {
         const item = {};
-        headers.forEach((h, i) => {
-            item[h.trim()] = cols[i] || "";
-        });
+        headers.forEach((h, i) => item[h.trim()] = cols[i] || "");
         return item;
     });
 }
 
 /* ================= HELPERS ================= */
 function normalize(text) {
-    return text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-}
-
-function driveToImageUrl(url) {
-    if (!url) return DEFAULT_IMAGE;
-    const clean = url.replace(/^"+|"+$/g, "").trim();
-
-    if (clean.includes("lh3.googleusercontent.com")) return clean;
-    if (clean.includes("id=")) {
-        const id = clean.split("id=")[1];
-        return `https://lh3.googleusercontent.com/d/${id}`;
-    }
-    return clean;
+    return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 /* ================= CART ================= */
@@ -87,148 +83,92 @@ function saveCart(cart) {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
 
-function updateCart(item, delta) {
+function addBurgerToCart(item, carnes) {
     const cart = getCart();
-    const key = item.Nombre;
+    const key = `${item.Nombre}|${carnes}`;
+
+    let precioFinal = Number(item.Precio);
+    if (carnes === 2) precioFinal += EXTRAS.doble;
+    if (carnes === 3) precioFinal += EXTRAS.triple;
 
     if (!cart[key]) {
         cart[key] = {
             nombre: item.Nombre,
-            precio: Number(item.Precio),
+            carnes,
+            precio: precioFinal,
             cantidad: 0
         };
     }
 
-    cart[key].cantidad += delta;
-
-    if (cart[key].cantidad <= 0) {
-        delete cart[key];
-    }
-
+    cart[key].cantidad += 1;
     saveCart(cart);
-    return cart[key]?.cantidad || 0;
-}
-
-/* ================= MODAL IMAGEN ================= */
-const modal = document.getElementById("imageModal");
-const modalImg = document.getElementById("modalImage");
-const closeBtn = document.getElementById("closeModal");
-
-closeBtn.addEventListener("click", closeModal);
-modal.addEventListener("click", e => {
-    if (e.target === modal) closeModal();
-});
-
-function openModal(src) {
-    modalImg.src = src;
-    modal.classList.add("active");
-    document.body.classList.add("modal-open");
-}
-
-function closeModal() {
-    modal.classList.remove("active");
-    modalImg.src = "";
-    document.body.classList.remove("modal-open");
 }
 
 /* ================= RENDER ================= */
 function renderMenu(items) {
-    const cart = getCart();
-
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
+        if (item.Categoria === "CONFIG") return;
 
         const categoriaId = normalize(item.Categoria);
         const contenedor = document.querySelector(`#${categoriaId} .productos`);
         if (!contenedor) return;
 
-        const imgSrc = item.Imagen ? driveToImageUrl(item.Imagen) : DEFAULT_IMAGE;
-        const cantidadActual = cart[item.Nombre]?.cantidad || 0;
-
         const producto = document.createElement("div");
         producto.className = "producto";
 
         producto.innerHTML = `
-            <img src="${imgSrc}" alt="${item.Nombre}">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
                 <span class="precio">$${item.Precio}</span>
-
-                <div class="cantidad-control">
-                    <button class="menos">−</button>
-                    <span class="cantidad">${cantidadActual}</span>
-                    <button class="mas">+</button>
-                </div>
+                <button class="mas">+</button>
             </div>
         `;
 
-        const img = producto.querySelector("img");
-        img.onerror = () => img.src = DEFAULT_IMAGE;
-        img.addEventListener("click", e => {
-            e.stopPropagation();
-            openModal(imgSrc);
-        });
-
-        const spanCantidad = producto.querySelector(".cantidad");
-
         producto.querySelector(".mas").addEventListener("click", () => {
-            spanCantidad.textContent = updateCart(item, 1);
-        });
-
-        producto.querySelector(".menos").addEventListener("click", () => {
-            spanCantidad.textContent = updateCart(item, -1);
+            if (normalize(item.Categoria) === "hamburguesas") {
+                // acá luego conectamos el modal de carnes
+                addBurgerToCart(item, 1);
+            } else {
+                addBurgerToCart(item, 1);
+            }
         });
 
         contenedor.appendChild(producto);
     });
 }
 
-/* ================= WHATSAPP + DELIVERY MODAL ================= */
+/* ================= WHATSAPP ================= */
 function initWhatsappButton() {
-    const btnWA = document.querySelector(".whatsapp-float");
-    const deliveryModal = document.getElementById("deliveryModal");
-    const btnConDelivery = document.getElementById("btnConDelivery");
-    const btnTakeAway = document.getElementById("btnTakeAway");
-
-    btnWA.addEventListener("click", e => {
+    document.querySelector(".whatsapp-float").addEventListener("click", e => {
         e.preventDefault();
 
-        if (!Object.keys(getCart()).length) {
-            alert("No agregaste ningún producto al pedido.");
+        const cart = getCart();
+        if (!Object.keys(cart).length) {
+            alert("No agregaste ningún producto.");
             return;
         }
 
-        deliveryModal.classList.add("active");
-        document.body.classList.add("modal-open");
-    });
+        let detalle = "";
+        let total = 0;
 
-    btnConDelivery.addEventListener("click", () => enviarPedido("Con delivery"));
-    btnTakeAway.addEventListener("click", () => enviarPedido("Take away"));
-}
+        Object.values(cart).forEach(item => {
+            total += item.precio * item.cantidad;
+            const carneTxt = item.carnes > 1 ? ` (${item.carnes} carnes)` : "";
+            detalle += `• ${item.cantidad} x ${item.nombre}${carneTxt}\n`;
+        });
 
-function enviarPedido(tipoEntrega) {
-    const items = Object.values(getCart());
-
-    let total = 0;
-    let detalle = "";
-
-    items.forEach(item => {
-        total += item.precio * item.cantidad;
-        detalle += `• ${item.cantidad} x ${item.nombre}\n`;
-    });
-
-    const mensaje = `
+        const mensaje = `
 Hola 👋
 Quería hacer el siguiente pedido:
 
 ${detalle}
 Total: $${total}
-Entrega: ${tipoEntrega}
 `.trim();
 
-    localStorage.removeItem(CART_KEY);
-
-    window.location.href =
-        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+        localStorage.removeItem(CART_KEY);
+        window.location.href =
+            `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+    });
 }
