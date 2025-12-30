@@ -3,6 +3,7 @@ const DEFAULT_IMAGE = "img/default.jpg";
 const WHATSAPP_NUMBER = "5492634546537";
 const CART_KEY = "burgerbite_cart";
 
+/* ================= GLOBAL CONFIG ================= */
 const CONFIG = {
     EXTRA_DOBLE: 0,
     EXTRA_TRIPLE: 0
@@ -10,6 +11,7 @@ const CONFIG = {
 
 let pendingBurger = null;
 
+/* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
     fetch(CSV_URL)
         .then(res => res.text())
@@ -24,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ================= CSV ================= */
-
 function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -44,17 +45,16 @@ function parseCSV(text) {
     }
 
     if (current || row.length) rows.push([...row, current.trim()]);
-    const headers = rows.shift();
 
+    const headers = rows.shift();
     return rows.map(cols => {
-        const obj = {};
-        headers.forEach((h, i) => obj[h.trim()] = cols[i] || "");
-        return obj;
+        const item = {};
+        headers.forEach((h, i) => item[h.trim()] = cols[i] || "");
+        return item;
     });
 }
 
 /* ================= CONFIG ================= */
-
 function loadConfig(items) {
     items.forEach(item => {
         if (normalize(item.Categoria) === "config") {
@@ -64,16 +64,17 @@ function loadConfig(items) {
     });
 }
 
-function normalize(t) {
-    return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+/* ================= HELPERS ================= */
+function normalize(text) {
+    return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function driveToImageUrl(url) {
-    return url ? url.replace(/^"+|"+$/g, "") : DEFAULT_IMAGE;
+    if (!url) return DEFAULT_IMAGE;
+    return url.replace(/^"+|"+$/g, "").trim();
 }
 
 /* ================= CART ================= */
-
 function getCart() {
     return JSON.parse(localStorage.getItem(CART_KEY)) || {};
 }
@@ -97,74 +98,73 @@ function removeFromCart(nombre) {
     saveCart(cart);
 }
 
-function getBurgerCount(base) {
-    return Object.values(getCart())
-        .filter(i => i.nombre.startsWith(base))
-        .reduce((s, i) => s + i.cantidad, 0);
+function getBurgerCount(nombreBase) {
+    const cart = getCart();
+    let total = 0;
+    Object.values(cart).forEach(i => {
+        if (i.nombre.startsWith(nombreBase)) total += i.cantidad;
+    });
+    return total;
 }
 
 /* ================= MODAL CARNES ================= */
-
 function initMeatModal() {
     const modal = document.getElementById("meatModal");
+    const cancel = document.getElementById("cancelMeat");
 
     document.querySelectorAll(".meat-btn").forEach(btn => {
         btn.onclick = () => {
             const carnes = Number(btn.dataset.carnes);
             let extra = carnes === 2 ? CONFIG.EXTRA_DOBLE : carnes === 3 ? CONFIG.EXTRA_TRIPLE : 0;
 
-            addToCart(
-                `${pendingBurger.Nombre} (${carnes} carnes)`,
-                Number(pendingBurger.Precio) + extra
-            );
+            const nombreFinal = `${pendingBurger.Nombre} (${carnes} carnes)`;
+            const precioFinal = Number(pendingBurger.Precio) + extra;
 
-            pendingBurger.counter.textContent =
-                getBurgerCount(pendingBurger.Nombre);
+            addToCart(nombreFinal, precioFinal);
+            pendingBurger.counter.textContent = getBurgerCount(pendingBurger.Nombre);
 
             modal.classList.remove("active");
             document.body.classList.remove("modal-open");
         };
     });
 
-    document.getElementById("cancelMeat").onclick = () => {
+    cancel.onclick = () => {
         modal.classList.remove("active");
         document.body.classList.remove("modal-open");
     };
 }
 
 /* ================= MODAL IMAGEN ================= */
-
-const imgModal = document.getElementById("imageModal");
-const img = document.getElementById("modalImage");
-
-document.getElementById("closeModal").onclick = closeImg;
-imgModal.onclick = e => e.target === imgModal && closeImg();
+const modalImgBox = document.getElementById("imageModal");
+const modalImg = document.getElementById("modalImage");
+document.getElementById("closeModal").onclick = closeModal;
+modalImgBox.onclick = e => e.target === modalImgBox && closeModal();
 
 function openModal(src) {
-    img.src = src;
-    imgModal.classList.add("active");
+    modalImg.src = src;
+    modalImgBox.classList.add("active");
     document.body.classList.add("modal-open");
 }
 
-function closeImg() {
-    imgModal.classList.remove("active");
-    img.src = "";
+function closeModal() {
+    modalImgBox.classList.remove("active");
+    modalImg.src = "";
     document.body.classList.remove("modal-open");
 }
 
 /* ================= RENDER ================= */
-
 function renderMenu(items) {
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
         if (normalize(item.Categoria) === "config") return;
 
-        const cont = document.querySelector(`#${normalize(item.Categoria)} .productos`);
-        if (!cont) return;
+        const contenedor = document.querySelector(`#${normalize(item.Categoria)} .productos`);
+        if (!contenedor) return;
 
-        const div = document.createElement("div");
-        div.className = "producto";
-        div.innerHTML = `
+        const producto = document.createElement("div");
+        producto.className = "producto";
+
+        producto.innerHTML = `
             <img src="${driveToImageUrl(item.Imagen)}">
             <div class="info">
                 <h3>${item.Nombre}</h3>
@@ -178,65 +178,77 @@ function renderMenu(items) {
             </div>
         `;
 
-        const counter = div.querySelector(".cantidad");
+        const span = producto.querySelector(".cantidad");
 
-        div.querySelector(".mas").onclick = () => {
+        producto.querySelector(".mas").onclick = () => {
             if (normalize(item.Categoria) === "hamburguesas") {
-                pendingBurger = { ...item, counter };
+                pendingBurger = { ...item, counter: span };
 
                 document.querySelector('[data-carnes="1"] .meat-price').textContent =
                     `$${item.Precio}`;
                 document.querySelector('[data-carnes="2"] .meat-price').textContent =
-                    `+$${CONFIG.EXTRA_DOBLE} → $${+item.Precio + CONFIG.EXTRA_DOBLE}`;
+                    `+$${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
                 document.querySelector('[data-carnes="3"] .meat-price').textContent =
-                    `+$${CONFIG.EXTRA_TRIPLE} → $${+item.Precio + CONFIG.EXTRA_TRIPLE}`;
+                    `+$${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
 
                 document.getElementById("meatModal").classList.add("active");
                 document.body.classList.add("modal-open");
             } else {
                 addToCart(item.Nombre, Number(item.Precio));
-                counter.textContent = getCart()[item.Nombre]?.cantidad || 0;
+                span.textContent = getCart()[item.Nombre]?.cantidad || 0;
             }
         };
 
-        div.querySelector(".menos").onclick = () => {
+        producto.querySelector(".menos").onclick = () => {
             removeFromCart(item.Nombre);
-            counter.textContent = getCart()[item.Nombre]?.cantidad || 0;
+            span.textContent = getCart()[item.Nombre]?.cantidad || 0;
         };
 
-        div.querySelector("img").onclick = () => openModal(driveToImageUrl(item.Imagen));
+        producto.querySelector("img").onclick = e => {
+            e.stopPropagation();
+            openModal(driveToImageUrl(item.Imagen));
+        };
 
-        cont.appendChild(div);
+        contenedor.appendChild(producto);
     });
 }
 
 /* ================= WHATSAPP ================= */
-
 function initWhatsappButton() {
     document.querySelector(".whatsapp-float").onclick = e => {
         e.preventDefault();
-        if (!Object.keys(getCart()).length) return alert("No agregaste productos.");
+        if (!Object.keys(getCart()).length) {
+            alert("No agregaste ningún producto.");
+            return;
+        }
         document.getElementById("deliveryModal").classList.add("active");
         document.body.classList.add("modal-open");
     };
 
-    btnConDelivery.onclick = () => enviarPedido("Con delivery");
-    btnTakeAway.onclick = () => enviarPedido("Take away");
+    document.getElementById("btnConDelivery").onclick = () => enviarPedido("Con delivery");
+    document.getElementById("btnTakeAway").onclick = () => enviarPedido("Take away");
 }
 
-function enviarPedido(tipo) {
-    const cart = Object.values(getCart());
+function enviarPedido(tipoEntrega) {
+    const items = Object.values(getCart());
     let total = 0;
-    let msg = "";
+    let detalle = "";
 
-    cart.forEach(i => {
+    items.forEach(i => {
         total += i.precio * i.cantidad;
-        msg += `• ${i.cantidad} x ${i.nombre}\n`;
+        detalle += `• ${i.cantidad} x ${i.nombre}\n`;
     });
+
+    const mensaje = `
+Hola 👋
+Quería hacer el siguiente pedido:
+
+${detalle}
+Total: $${total}
+Entrega: ${tipoEntrega}
+`.trim();
 
     localStorage.removeItem(CART_KEY);
     window.location.href =
-        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-            `Hola 👋\n\n${msg}\nTotal: $${total}\nEntrega: ${tipo}`
-        )}`;
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }
