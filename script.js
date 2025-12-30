@@ -69,7 +69,7 @@ function normalize(text) {
 }
 
 function driveToImageUrl(url) {
-    if (!url) return DEFAULT_IMAGE;
+    if (!url || url.trim() === "") return DEFAULT_IMAGE;
     return url.replace(/^"+|"+$/g, "").trim();
 }
 
@@ -98,7 +98,6 @@ function removeFromCart(nombre) {
     saveCart(cart);
 }
 
-/* 🔧 quitar 1 hamburguesa sin importar simple/doble/triple */
 function removeOneBurger(nombreBase) {
     const cart = getCart();
     for (const key of Object.keys(cart)) {
@@ -127,6 +126,9 @@ function initMeatModal() {
     const cancel = document.getElementById("cancelMeat");
 
     document.querySelectorAll(".meat-btn").forEach(btn => {
+        btn.classList.remove("destacada");
+        if (btn.dataset.carnes === "3") btn.classList.add("destacada");
+
         btn.onclick = () => {
             const carnes = Number(btn.dataset.carnes);
             const extra =
@@ -205,6 +207,9 @@ function renderMenu(items) {
             </div>
         `;
 
+        const img = producto.querySelector("img");
+        img.onerror = () => img.src = DEFAULT_IMAGE;
+
         const span = producto.querySelector(".cantidad");
 
         producto.querySelector(".mas").onclick = () => {
@@ -216,7 +221,7 @@ function renderMenu(items) {
                 document.querySelector('[data-carnes="2"] .meat-price').textContent =
                     `+ $${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
                 document.querySelector('[data-carnes="3"] .meat-price').textContent =
-                    `+ $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
+                    `🔥 + $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
 
                 document.getElementById("meatModal").classList.add("active");
                 document.body.classList.add("modal-open");
@@ -236,9 +241,9 @@ function renderMenu(items) {
             }
         };
 
-        producto.querySelector("img").onclick = e => {
+        img.onclick = e => {
             e.stopPropagation();
-            openModal(driveToImageUrl(item.Imagen));
+            openModal(img.src);
         };
 
         contenedor.appendChild(producto);
