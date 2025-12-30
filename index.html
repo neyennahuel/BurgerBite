@@ -7,7 +7,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -50,21 +50,21 @@
 <!-- MODAL CARNES -->
 <div class="meat-modal" id="meatModal">
     <div class="meat-box">
-        <h3>¿Cuántas carnes querés?</h3>
+        <h3>¿Cómo la querés?</h3>
 
         <div class="meat-options">
             <button class="meat-btn" data-carnes="1">
-                <strong>1 carne</strong>
+                <strong>Simple</strong>
                 <span class="meat-price"></span>
             </button>
 
             <button class="meat-btn" data-carnes="2">
-                <strong>2 carnes</strong>
+                <strong>Doble</strong>
                 <span class="meat-price"></span>
             </button>
 
             <button class="meat-btn" data-carnes="3">
-                <strong>3 carnes</strong>
+                <strong>Triple</strong>
                 <span class="meat-price"></span>
             </button>
         </div>
@@ -83,8 +83,15 @@
         </p>
 
         <div class="delivery-actions">
-            <button id="btnTakeAway" class="btn-delivery no">Take away</button>
-            <button id="btnConDelivery" class="btn-delivery yes">Con delivery</button>
+            <button id="btnTakeAway" class="btn-delivery no">
+                <span class="icon">🏪</span>
+                <span class="text">Take away</span>
+            </button>
+
+            <button id="btnConDelivery" class="btn-delivery yes">
+                <span class="icon">🛵</span>
+                <span class="text">Con delivery</span>
+            </button>
         </div>
 
         <p class="delivery-note">
@@ -93,8 +100,8 @@
     </div>
 </div>
 
-<a href="#" class="whatsapp-float">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
+<a href="#" class="whatsapp-float" aria-label="WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
 </a>
 
 <script src="script.js"></script>

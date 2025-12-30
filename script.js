@@ -3,7 +3,6 @@ const DEFAULT_IMAGE = "img/default.jpg";
 const WHATSAPP_NUMBER = "5492634546537";
 const CART_KEY = "burgerbite_cart";
 
-/* ================= GLOBAL CONFIG ================= */
 const CONFIG = {
     EXTRA_DOBLE: 0,
     EXTRA_TRIPLE: 0
@@ -11,7 +10,6 @@ const CONFIG = {
 
 let pendingBurger = null;
 
-/* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
     fetch(CSV_URL)
         .then(res => res.text())
@@ -25,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(() => alert("No se pudo cargar la carta."));
 });
 
-/* ================= CSV ================= */
 function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -54,7 +51,6 @@ function parseCSV(text) {
     });
 }
 
-/* ================= CONFIG ================= */
 function loadConfig(items) {
     items.forEach(item => {
         if (normalize(item.Categoria) === "config") {
@@ -64,7 +60,6 @@ function loadConfig(items) {
     });
 }
 
-/* ================= HELPERS ================= */
 function normalize(text) {
     return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -74,7 +69,6 @@ function driveToImageUrl(url) {
     return url.replace(/^"+|"+$/g, "").trim();
 }
 
-/* ================= CART ================= */
 function getCart() {
     return JSON.parse(localStorage.getItem(CART_KEY)) || {};
 }
@@ -107,7 +101,6 @@ function getBurgerCount(nombreBase) {
     return total;
 }
 
-/* ================= MODAL CARNES ================= */
 function initMeatModal() {
     const modal = document.getElementById("meatModal");
     const cancel = document.getElementById("cancelMeat");
@@ -117,7 +110,9 @@ function initMeatModal() {
             const carnes = Number(btn.dataset.carnes);
             let extra = carnes === 2 ? CONFIG.EXTRA_DOBLE : carnes === 3 ? CONFIG.EXTRA_TRIPLE : 0;
 
-            const nombreFinal = `${pendingBurger.Nombre} (${carnes} carnes)`;
+            const tipo = carnes === 1 ? "Simple" : carnes === 2 ? "Doble" : "Triple";
+
+            const nombreFinal = `${pendingBurger.Nombre} (${tipo})`;
             const precioFinal = Number(pendingBurger.Precio) + extra;
 
             addToCart(nombreFinal, precioFinal);
@@ -134,10 +129,11 @@ function initMeatModal() {
     };
 }
 
-/* ================= MODAL IMAGEN ================= */
 const modalImgBox = document.getElementById("imageModal");
 const modalImg = document.getElementById("modalImage");
-document.getElementById("closeModal").onclick = closeModal;
+const closeBtn = document.getElementById("closeModal");
+
+closeBtn.onclick = closeModal;
 modalImgBox.onclick = e => e.target === modalImgBox && closeModal();
 
 function openModal(src) {
@@ -152,7 +148,6 @@ function closeModal() {
     document.body.classList.remove("modal-open");
 }
 
-/* ================= RENDER ================= */
 function renderMenu(items) {
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
@@ -185,11 +180,11 @@ function renderMenu(items) {
                 pendingBurger = { ...item, counter: span };
 
                 document.querySelector('[data-carnes="1"] .meat-price').textContent =
-                    `$${item.Precio}`;
+                    `Precio base $${item.Precio}`;
                 document.querySelector('[data-carnes="2"] .meat-price').textContent =
-                    `+$${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
+                    `+ $${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
                 document.querySelector('[data-carnes="3"] .meat-price').textContent =
-                    `+$${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
+                    `+ $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
 
                 document.getElementById("meatModal").classList.add("active");
                 document.body.classList.add("modal-open");
@@ -213,7 +208,6 @@ function renderMenu(items) {
     });
 }
 
-/* ================= WHATSAPP ================= */
 function initWhatsappButton() {
     document.querySelector(".whatsapp-float").onclick = e => {
         e.preventDefault();
