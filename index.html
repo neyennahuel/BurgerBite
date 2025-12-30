@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carta - Burgerbite</title>
 
-    <!-- TIPOGRAFÍA PARA PROMOS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -42,13 +41,13 @@
     </section>
 </main>
 
-<!-- ================= MODAL IMAGEN ================= -->
+<!-- MODAL IMAGEN -->
 <div class="image-modal" id="imageModal">
     <span class="close" id="closeModal">&times;</span>
     <img id="modalImage" src="" alt="">
 </div>
 
-<!-- ================= MODAL SELECCIÓN DE CARNES ================= -->
+<!-- MODAL CARNES -->
 <div class="meat-modal" id="meatModal">
     <div class="meat-box">
         <h3>¿Cuántas carnes querés?</h3>
@@ -56,17 +55,17 @@
         <div class="meat-options">
             <button class="meat-btn" data-carnes="1">
                 <strong>1 carne</strong>
-                <span class="meat-price">Precio base</span>
+                <span class="meat-price"></span>
             </button>
 
             <button class="meat-btn" data-carnes="2">
                 <strong>2 carnes</strong>
-                <span class="meat-price">+ extra doble</span>
+                <span class="meat-price"></span>
             </button>
 
             <button class="meat-btn" data-carnes="3">
                 <strong>3 carnes</strong>
-                <span class="meat-price">+ extra triple</span>
+                <span class="meat-price"></span>
             </button>
         </div>
 
@@ -74,7 +73,7 @@
     </div>
 </div>
 
-<!-- ================= MODAL DELIVERY ================= -->
+<!-- MODAL DELIVERY -->
 <div class="delivery-modal" id="deliveryModal">
     <div class="delivery-box">
         <h3>¿Cómo querés tu pedido?</h3>
@@ -84,15 +83,8 @@
         </p>
 
         <div class="delivery-actions">
-            <button id="btnTakeAway" class="btn-delivery no">
-                <span class="icon">🏪</span>
-                <span class="text">Take away</span>
-            </button>
-
-            <button id="btnConDelivery" class="btn-delivery yes">
-                <span class="icon">🛵</span>
-                <span class="text">Con delivery</span>
-            </button>
+            <button id="btnTakeAway" class="btn-delivery no">Take away</button>
+            <button id="btnConDelivery" class="btn-delivery yes">Con delivery</button>
         </div>
 
         <p class="delivery-note">
@@ -101,12 +93,8 @@
     </div>
 </div>
 
-<!-- ================= BOTÓN WHATSAPP ================= -->
-<a href="#" class="whatsapp-float" aria-label="WhatsApp">
-    <img
-        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-        alt="WhatsApp"
-    >
+<a href="#" class="whatsapp-float">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg">
 </a>
 
 <script src="script.js"></script>
