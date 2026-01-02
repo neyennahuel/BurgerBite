@@ -68,10 +68,9 @@ function normalize(text) {
     return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-function cleanImageUrl(url) {
+function driveToImageUrl(url) {
     if (!url) return DEFAULT_IMAGE;
-    const clean = url.replace(/^"+|"+$/g, "").trim();
-    return clean ? clean : DEFAULT_IMAGE;
+    return url.replace(/^"+|"+$/g, "").trim() || DEFAULT_IMAGE;
 }
 
 /* ================= CART ================= */
@@ -165,7 +164,7 @@ closeBtn.onclick = closeModal;
 modalImgBox.onclick = e => e.target === modalImgBox && closeModal();
 
 function openModal(src) {
-    modalImg.src = src;
+    modalImg.src = src || DEFAULT_IMAGE;
     modalImgBox.classList.add("active");
     document.body.classList.add("modal-open");
 }
@@ -179,22 +178,23 @@ function closeModal() {
 /* ================= RENDER ================= */
 
 function renderMenu(items) {
+    const categoryCount = {};
+
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
         if (normalize(item.Categoria) === "config") return;
 
-        const contenedor = document.querySelector(
-            `#${normalize(item.Categoria)} .productos`
-        );
+        const categoria = normalize(item.Categoria);
+        const contenedor = document.querySelector(`#${categoria} .productos`);
         if (!contenedor) return;
+
+        categoryCount[categoria] = (categoryCount[categoria] || 0) + 1;
 
         const producto = document.createElement("div");
         producto.className = "producto";
 
-        const imgSrc = cleanImageUrl(item.Imagen);
-
         producto.innerHTML = `
-            <img src="${imgSrc}" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'">
+            <img src="${driveToImageUrl(item.Imagen)}">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
@@ -210,7 +210,7 @@ function renderMenu(items) {
         const span = producto.querySelector(".cantidad");
 
         producto.querySelector(".mas").onclick = () => {
-            if (normalize(item.Categoria) === "hamburguesas") {
+            if (categoria === "hamburguesas") {
                 pendingBurger = { ...item, counter: span };
 
                 document.querySelector('[data-carnes="1"] .meat-price').textContent =
@@ -229,7 +229,7 @@ function renderMenu(items) {
         };
 
         producto.querySelector(".menos").onclick = () => {
-            if (normalize(item.Categoria) === "hamburguesas") {
+            if (categoria === "hamburguesas") {
                 removeOneBurger(item.Nombre);
                 span.textContent = getBurgerCount(item.Nombre);
             } else {
@@ -240,11 +240,25 @@ function renderMenu(items) {
 
         producto.querySelector("img").onclick = e => {
             e.stopPropagation();
-            openModal(e.target.src);
+            openModal(driveToImageUrl(item.Imagen));
         };
 
         contenedor.appendChild(producto);
     });
+
+    // 🔥 ocultar secciones sin productos (ej: bebidas)
+    Object.keys(categoryCount).forEach(cat => {
+        if (categoryCount[cat] === 0) {
+            const section = document.getElementById(cat);
+            if (section) section.style.display = "none";
+        }
+    });
+
+    // si no hubo ninguna bebida válida
+    if (!categoryCount["bebidas"]) {
+        const bebidas = document.getElementById("bebidas");
+        if (bebidas) bebidas.style.display = "none";
+    }
 }
 
 /* ================= WHATSAPP ================= */
@@ -289,4 +303,3 @@ Entrega: ${tipoEntrega}
     window.location.href =
         `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }
-
