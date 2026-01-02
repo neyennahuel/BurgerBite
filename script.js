@@ -289,3 +289,4 @@ Entrega: ${tipoEntrega}
     window.location.href =
         `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }
+
