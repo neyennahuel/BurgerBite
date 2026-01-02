@@ -68,9 +68,10 @@ function normalize(text) {
     return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-function driveToImageUrl(url) {
-    if (!url || url.trim() === "") return DEFAULT_IMAGE;
-    return url.replace(/^"+|"+$/g, "").trim();
+function cleanImageUrl(url) {
+    if (!url) return DEFAULT_IMAGE;
+    const clean = url.replace(/^"+|"+$/g, "").trim();
+    return clean ? clean : DEFAULT_IMAGE;
 }
 
 /* ================= CART ================= */
@@ -126,9 +127,6 @@ function initMeatModal() {
     const cancel = document.getElementById("cancelMeat");
 
     document.querySelectorAll(".meat-btn").forEach(btn => {
-        btn.classList.remove("destacada");
-        if (btn.dataset.carnes === "3") btn.classList.add("destacada");
-
         btn.onclick = () => {
             const carnes = Number(btn.dataset.carnes);
             const extra =
@@ -193,8 +191,10 @@ function renderMenu(items) {
         const producto = document.createElement("div");
         producto.className = "producto";
 
+        const imgSrc = cleanImageUrl(item.Imagen);
+
         producto.innerHTML = `
-            <img src="${driveToImageUrl(item.Imagen)}">
+            <img src="${imgSrc}" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
@@ -207,9 +207,6 @@ function renderMenu(items) {
             </div>
         `;
 
-        const img = producto.querySelector("img");
-        img.onerror = () => img.src = DEFAULT_IMAGE;
-
         const span = producto.querySelector(".cantidad");
 
         producto.querySelector(".mas").onclick = () => {
@@ -221,7 +218,7 @@ function renderMenu(items) {
                 document.querySelector('[data-carnes="2"] .meat-price').textContent =
                     `+ $${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
                 document.querySelector('[data-carnes="3"] .meat-price').textContent =
-                    `🔥 + $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
+                    `+ $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
 
                 document.getElementById("meatModal").classList.add("active");
                 document.body.classList.add("modal-open");
@@ -241,9 +238,9 @@ function renderMenu(items) {
             }
         };
 
-        img.onclick = e => {
+        producto.querySelector("img").onclick = e => {
             e.stopPropagation();
-            openModal(img.src);
+            openModal(e.target.src);
         };
 
         contenedor.appendChild(producto);
