@@ -70,7 +70,8 @@ function normalize(text) {
 
 function driveToImageUrl(url) {
     if (!url) return DEFAULT_IMAGE;
-    return url.replace(/^"+|"+$/g, "").trim() || DEFAULT_IMAGE;
+    const clean = url.replace(/^"+|"+$/g, "").trim();
+    return clean || DEFAULT_IMAGE;
 }
 
 /* ================= CART ================= */
@@ -165,8 +166,9 @@ modalImgBox.onclick = e => e.target === modalImgBox && closeModal();
 
 function openModal(src) {
     modalImg.src = src || DEFAULT_IMAGE;
+    modalImg.onerror = () => modalImg.src = DEFAULT_IMAGE;
     modalImgBox.classList.add("active");
-    document.body.classList.add("modal-open");
+    document.body.classVerify = "modal-open";
 }
 
 function closeModal() {
@@ -193,8 +195,10 @@ function renderMenu(items) {
         const producto = document.createElement("div");
         producto.className = "producto";
 
+        const imgSrc = driveToImageUrl(item.Imagen);
+
         producto.innerHTML = `
-            <img src="${driveToImageUrl(item.Imagen)}">
+            <img src="${imgSrc}" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'">
             <div class="info">
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
@@ -240,21 +244,12 @@ function renderMenu(items) {
 
         producto.querySelector("img").onclick = e => {
             e.stopPropagation();
-            openModal(driveToImageUrl(item.Imagen));
+            openModal(imgSrc);
         };
 
         contenedor.appendChild(producto);
     });
 
-    // 🔥 ocultar secciones sin productos (ej: bebidas)
-    Object.keys(categoryCount).forEach(cat => {
-        if (categoryCount[cat] === 0) {
-            const section = document.getElementById(cat);
-            if (section) section.style.display = "none";
-        }
-    });
-
-    // si no hubo ninguna bebida válida
     if (!categoryCount["bebidas"]) {
         const bebidas = document.getElementById("bebidas");
         if (bebidas) bebidas.style.display = "none";
