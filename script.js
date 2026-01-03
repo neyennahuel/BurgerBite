@@ -68,10 +68,9 @@ function normalize(text) {
     return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-function driveToImageUrl(url) {
-    if (!url) return DEFAULT_IMAGE;
-    const clean = url.replace(/^"+|"+$/g, "").trim();
-    return clean || DEFAULT_IMAGE;
+function cleanUrl(url) {
+    if (!url) return "";
+    return url.replace(/^"+|"+$/g, "").trim();
 }
 
 /* ================= CART ================= */
@@ -165,10 +164,9 @@ closeBtn.onclick = closeModal;
 modalImgBox.onclick = e => e.target === modalImgBox && closeModal();
 
 function openModal(src) {
-    modalImg.src = src || DEFAULT_IMAGE;
-    modalImg.onerror = () => modalImg.src = DEFAULT_IMAGE;
+    modalImg.src = src;
     modalImgBox.classList.add("active");
-    document.body.classVerify = "modal-open";
+    document.body.classList.add("modal-open");
 }
 
 function closeModal() {
@@ -180,26 +178,37 @@ function closeModal() {
 /* ================= RENDER ================= */
 
 function renderMenu(items) {
-    const categoryCount = {};
+    const categoriasConProductos = {};
 
     items.forEach(item => {
         if (item.Disponible !== "TRUE") return;
         if (normalize(item.Categoria) === "config") return;
 
-        const categoria = normalize(item.Categoria);
-        const contenedor = document.querySelector(`#${categoria} .productos`);
+        const cat = normalize(item.Categoria);
+        if (!categoriasConProductos[cat]) categoriasConProductos[cat] = [];
+        categoriasConProductos[cat].push(item);
+    });
+
+    Object.keys(categoriasConProductos).forEach(cat => {
+        const contenedor = document.querySelector(`#${cat} .productos`);
         if (!contenedor) return;
 
-        categoryCount[categoria] = (categoryCount[categoria] || 0) + 1;
+        categoriasConProductos[cat].forEach(item => {
+            const producto = document.createElement("div");
+            producto.className = "producto";
 
-        const producto = document.createElement("div");
-        producto.className = "producto";
+            const img = document.createElement("img");
+            const src = cleanUrl(item.Imagen);
+            img.src = src || DEFAULT_IMAGE;
+            img.onerror = () => { img.src = DEFAULT_IMAGE; };
+            img.onclick = e => {
+                e.stopPropagation();
+                openModal(img.src);
+            };
 
-        const imgSrc = driveToImageUrl(item.Imagen);
-
-        producto.innerHTML = `
-            <img src="${imgSrc}" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'">
-            <div class="info">
+            const info = document.createElement("div");
+            info.className = "info";
+            info.innerHTML = `
                 <h3>${item.Nombre}</h3>
                 <p>${item.Descripcion}</p>
                 <span class="precio">$${item.Precio}</span>
@@ -208,52 +217,44 @@ function renderMenu(items) {
                     <span class="cantidad">0</span>
                     <button class="mas">+</button>
                 </div>
-            </div>
-        `;
+            `;
 
-        const span = producto.querySelector(".cantidad");
+            const span = info.querySelector(".cantidad");
 
-        producto.querySelector(".mas").onclick = () => {
-            if (categoria === "hamburguesas") {
-                pendingBurger = { ...item, counter: span };
+            info.querySelector(".mas").onclick = () => {
+                if (cat === "hamburguesas") {
+                    pendingBurger = { ...item, counter: span };
 
-                document.querySelector('[data-carnes="1"] .meat-price').textContent =
-                    `Precio base $${item.Precio}`;
-                document.querySelector('[data-carnes="2"] .meat-price').textContent =
-                    `+ $${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
-                document.querySelector('[data-carnes="3"] .meat-price').textContent =
-                    `+ $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
+                    document.querySelector('[data-carnes="1"] .meat-price').textContent =
+                        `Precio base $${item.Precio}`;
+                    document.querySelector('[data-carnes="2"] .meat-price').textContent =
+                        `+ $${CONFIG.EXTRA_DOBLE} → $${Number(item.Precio) + CONFIG.EXTRA_DOBLE}`;
+                    document.querySelector('[data-carnes="3"] .meat-price').textContent =
+                        `+ $${CONFIG.EXTRA_TRIPLE} → $${Number(item.Precio) + CONFIG.EXTRA_TRIPLE}`;
 
-                document.getElementById("meatModal").classList.add("active");
-                document.body.classList.add("modal-open");
-            } else {
-                addToCart(item.Nombre, Number(item.Precio));
-                span.textContent = getCart()[item.Nombre]?.cantidad || 0;
-            }
-        };
+                    document.getElementById("meatModal").classList.add("active");
+                    document.body.classList.add("modal-open");
+                } else {
+                    addToCart(item.Nombre, Number(item.Precio));
+                    span.textContent = getCart()[item.Nombre]?.cantidad || 0;
+                }
+            };
 
-        producto.querySelector(".menos").onclick = () => {
-            if (categoria === "hamburguesas") {
-                removeOneBurger(item.Nombre);
-                span.textContent = getBurgerCount(item.Nombre);
-            } else {
-                removeFromCart(item.Nombre);
-                span.textContent = getCart()[item.Nombre]?.cantidad || 0;
-            }
-        };
+            info.querySelector(".menos").onclick = () => {
+                if (cat === "hamburguesas") {
+                    removeOneBurger(item.Nombre);
+                    span.textContent = getBurgerCount(item.Nombre);
+                } else {
+                    removeFromCart(item.Nombre);
+                    span.textContent = getCart()[item.Nombre]?.cantidad || 0;
+                }
+            };
 
-        producto.querySelector("img").onclick = e => {
-            e.stopPropagation();
-            openModal(imgSrc);
-        };
-
-        contenedor.appendChild(producto);
+            producto.appendChild(img);
+            producto.appendChild(info);
+            contenedor.appendChild(producto);
+        });
     });
-
-    if (!categoryCount["bebidas"]) {
-        const bebidas = document.getElementById("bebidas");
-        if (bebidas) bebidas.style.display = "none";
-    }
 }
 
 /* ================= WHATSAPP ================= */
