@@ -168,7 +168,7 @@ function openModal(src) {
     modalImg.src = src || DEFAULT_IMAGE;
     modalImg.onerror = () => modalImg.src = DEFAULT_IMAGE;
     modalImgBox.classList.add("active");
-    document.body.classVerify = "modal-open";
+    document.body.classList.add("modal-open");
 }
 
 function closeModal() {
@@ -192,11 +192,10 @@ function renderMenu(items) {
 
         categoryCount[categoria] = (categoryCount[categoria] || 0) + 1;
 
-        const producto = document.createElement("div");
-        producto.className = "producto";
-
         const imgSrc = driveToImageUrl(item.Imagen);
 
+        const producto = document.createElement("div");
+        producto.className = "producto";
         producto.innerHTML = `
             <img src="${imgSrc}" onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}'">
             <div class="info">
