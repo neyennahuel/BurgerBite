@@ -257,18 +257,22 @@ function renderMenu(items) {
 
 /* ================= WHATSAPP ================= */
 
-const deliveryModal = document.getElementById("deliveryModal");
-const deliveryCloseBtn = document.getElementById("closeDelivery");
+function initDeliveryModal() {
+    const deliveryModal = document.getElementById("deliveryModal");
+    const deliveryCloseBtn = document.getElementById("closeDelivery");
+    if (!deliveryModal || !deliveryCloseBtn) return;
 
-function closeDeliveryModal() {
-    deliveryModal.classList.remove("active");
-    document.body.classList.remove("modal-open");
+    const closeDeliveryModal = () => {
+        deliveryModal.classList.remove("active");
+        document.body.classList.remove("modal-open");
+    };
+
+    deliveryCloseBtn.onclick = closeDeliveryModal;
+    deliveryModal.onclick = e => e.target === deliveryModal && closeDeliveryModal();
 }
 
-deliveryCloseBtn.onclick = closeDeliveryModal;
-deliveryModal.onclick = e => e.target === deliveryModal && closeDeliveryModal();
-
 function initWhatsappButton() {
+    initDeliveryModal();
     document.querySelector(".whatsapp-float").onclick = e => {
         e.preventDefault();
         if (!Object.keys(getCart()).length) {
