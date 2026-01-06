@@ -1,8 +1,6 @@
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8eU89XL7ucxbUaggrjgyWlnT6oDKMGRCL6SO7ywbM-ObzBueYGiVtYMHUx7PJ1fqJIrcrcuGcTG2g/pub?gid=0&single=true&output=csv";
 const DEFAULT_IMAGE = "img/default.jpg";
 const WHATSAPP_NUMBER = "5492634546537";
-const CART_KEY = "burgerbite_cart";
-
 const CONFIG = {
     EXTRA_DOBLE: 0,
     EXTRA_TRIPLE: 0
@@ -76,12 +74,14 @@ function driveToImageUrl(url) {
 
 /* ================= CART ================= */
 
+let cartMemory = {};
+
 function getCart() {
-    return JSON.parse(localStorage.getItem(CART_KEY)) || {};
+    return cartMemory;
 }
 
 function saveCart(cart) {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    cartMemory = cart;
 }
 
 function addToCart(nombre, precio) {
@@ -304,7 +304,7 @@ Total: $${total}
 Entrega: ${tipoEntrega}
 `.trim();
 
-    localStorage.removeItem(CART_KEY);
+    saveCart({});
     window.location.href =
         `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }
