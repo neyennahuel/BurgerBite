@@ -258,14 +258,14 @@ function renderMenu(items) {
 /* ================= WHATSAPP ================= */
 
 const deliveryModal = document.getElementById("deliveryModal");
-const deliveryCloseBtn = document.getElementById("closeDelivery");
+const deliveryCancelBtn = document.getElementById("cancelDelivery");
 
 function closeDeliveryModal() {
     deliveryModal.classList.remove("active");
     document.body.classList.remove("modal-open");
 }
 
-deliveryCloseBtn.onclick = closeDeliveryModal;
+deliveryCancelBtn.onclick = closeDeliveryModal;
 deliveryModal.onclick = e => e.target === deliveryModal && closeDeliveryModal();
 
 function initWhatsappButton() {
