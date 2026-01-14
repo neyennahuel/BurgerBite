@@ -163,6 +163,7 @@ const closeBtn = document.getElementById("closeModal");
 
 closeBtn.onclick = closeModal;
 modalImgBox.onclick = e => e.target === modalImgBox && closeModal();
+modalImg.onclick = closeModal;
 
 function openModal(src) {
     modalImg.src = src || DEFAULT_IMAGE;
