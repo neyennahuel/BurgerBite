@@ -1,8 +1,6 @@
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT8eU89XL7ucxbUaggrjgyWlnT6oDKMGRCL6SO7ywbM-ObzBueYGiVtYMHUx7PJ1fqJIrcrcuGcTG2g/pub?gid=0&single=true&output=csv";
 const DEFAULT_IMAGE = "img/default.jpg";
 const WHATSAPP_NUMBER = "5492634546537";
-const CART_KEY = "burgerbite_cart";
-
 const CONFIG = {
     EXTRA_DOBLE: 0,
     EXTRA_TRIPLE: 0
@@ -76,12 +74,14 @@ function driveToImageUrl(url) {
 
 /* ================= CART ================= */
 
+let cartMemory = {};
+
 function getCart() {
-    return JSON.parse(localStorage.getItem(CART_KEY)) || {};
+    return cartMemory;
 }
 
 function saveCart(cart) {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    cartMemory = cart;
 }
 
 function addToCart(nombre, precio) {
@@ -258,7 +258,22 @@ function renderMenu(items) {
 
 /* ================= WHATSAPP ================= */
 
+function initDeliveryModal() {
+    const deliveryModal = document.getElementById("deliveryModal");
+    const deliveryCloseBtn = document.getElementById("closeDelivery");
+    if (!deliveryModal || !deliveryCloseBtn) return;
+
+    const closeDeliveryModal = () => {
+        deliveryModal.classList.remove("active");
+        document.body.classList.remove("modal-open");
+    };
+
+    deliveryCloseBtn.onclick = closeDeliveryModal;
+    deliveryModal.onclick = e => e.target === deliveryModal && closeDeliveryModal();
+}
+
 function initWhatsappButton() {
+    initDeliveryModal();
     document.querySelector(".whatsapp-float").onclick = e => {
         e.preventDefault();
         if (!Object.keys(getCart()).length) {
@@ -294,7 +309,7 @@ Total: $${total}
 Entrega: ${tipoEntrega}
 `.trim();
 
-    localStorage.removeItem(CART_KEY);
+    saveCart({});
     window.location.href =
         `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 }

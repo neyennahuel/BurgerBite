@@ -374,6 +374,7 @@ section h2 {
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     animation: popIn 0.25s ease;
+    position: relative;
 }
 
 @keyframes popIn {
@@ -442,6 +443,31 @@ section h2 {
     color: #aaaaaa;
     line-height: 1.3;
 }
+
+.delivery-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 2px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: #bdbdbd;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    opacity: 0.8;
+}
+
+.delivery-close:hover {
+    color: #ffffff;
+    opacity: 1;
+}
+
 
 /* ================================================= */
 /* =========== MODAL SELECCIÓN DE CARNES ============ */
